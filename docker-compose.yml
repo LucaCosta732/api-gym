@@ -1,0 +1,12 @@
+version: '3'
+services:
+    h2db:
+      image: h2database/h2database:latest
+      ports:
+        - 8082:8082
+      environment:
+        - ACCEPT_EULA=yes
+        - MAX_HEAP_SIZE=1024m
+        - DB_CLOSE_ON_EXIT=FALSE
+      volumes:
+        - ~/h2db/data:/opt/h2db/data
