@@ -10,7 +10,6 @@ import it.lucacosta.gym.model.Allenatore;
 @Mapper(componentModel = "spring")
 public interface AllenatoreMapper {
 
-    //@Mapping(target = "id", ignore = true)
     public Allenatore toModel(AllenatoreDto allenatoreDto);
     public AllenatoreDto toDto(Allenatore allenatore);
 

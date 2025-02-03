@@ -10,7 +10,15 @@ import lombok.NoArgsConstructor;
 public class TipoAbbonamentoDto {
 
     private Long id;
-    private String nome;
+    private Tipo nome;
     private String descrizione;
     private Double prezzo;
+
+    public enum Tipo{
+        ANNUALE,
+        SEMESTRALE,
+        MENSILE
+    }
+
+    
 }

@@ -43,5 +43,4 @@ public class AllenatoreControllerImpl implements AllenatoreController {
     public ResponseEntity<Boolean> deleteAllenatore(Long id) {
         return new ResponseEntity<Boolean>(allenatoreService.deleteAllenatore(id), HttpStatus.OK);
     }
-
 }

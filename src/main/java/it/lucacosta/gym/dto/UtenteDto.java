@@ -1,4 +1,6 @@
 package it.lucacosta.gym.dto;
+import java.sql.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +16,7 @@ public class UtenteDto {
     private String cognome;
     private String email;
     private String password;
-    private String dataIscrizione;
-    private AbbonamentoDto abbonamento;
+    private Date dataIscrizione;
     private String telefono;
 
 }

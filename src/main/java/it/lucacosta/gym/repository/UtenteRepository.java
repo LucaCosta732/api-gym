@@ -12,5 +12,6 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     Utente findByEmail(String email);
     Optional<List<Utente>> findByNome(String nome);
     Optional<List<Utente>> findByCognome(String cognome);
+    List<Utente> findAllByNomeContainsIgnoreCase(String name);
     
 }

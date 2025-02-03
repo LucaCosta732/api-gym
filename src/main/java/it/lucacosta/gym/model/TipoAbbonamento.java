@@ -2,6 +2,8 @@ package it.lucacosta.gym.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,11 +25,19 @@ public class TipoAbbonamento {
     private Long id;
 
     @Column(name = "NOME")
-    private String nome;
+    @Enumerated(EnumType.STRING)
+    private Tipo nome;
 
     @Column(name = "DESCRIZIONE")
     private String descrizione;
 
     @Column(name = "PREZZO")
     private Double prezzo;
+
+
+    public enum Tipo{
+        ANNUALE,
+        SEMESTRALE,
+        MENSILE
+    }
 }

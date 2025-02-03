@@ -1,8 +1,9 @@
 package it.lucacosta.gym.service;
 
 import java.util.List;
-import it.lucacosta.gym.dto.AllenatoreDto;
 
+
+import it.lucacosta.gym.dto.AllenatoreDto;
 
 public interface AllenatoreService {
 

@@ -1,8 +1,6 @@
 package it.lucacosta.gym.service.impl;
 
 import java.util.List;
-
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,14 +32,7 @@ public class AllenatoreServiceImpl implements AllenatoreService {
             allenatoreModel.setId(null);
         }
 
-        try {
-            allenatoreRepository.saveAll(a);
-        } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Allenatore con questa email già esistente",
-                    e);
-        }
+        allenatoreRepository.saveAll(a);
 
         log.info("[END] - [AllenatoreServiceImpl] - addAllenatore - Allenatore salvato: {}", a);
 
@@ -118,5 +109,7 @@ public class AllenatoreServiceImpl implements AllenatoreService {
 
         return allenatoreMapper.toDto(allenatori);
     }
+
+    
 
 }

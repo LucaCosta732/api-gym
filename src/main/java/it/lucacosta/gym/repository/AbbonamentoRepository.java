@@ -7,4 +7,5 @@ import it.lucacosta.gym.model.Abbonamento;
 public interface AbbonamentoRepository extends JpaRepository<Abbonamento, Long> {
 
     
+    
 }
