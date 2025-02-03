@@ -24,50 +24,99 @@ public class AllenatoreServiceImpl implements AllenatoreService {
     private final AllenatoreMapper allenatoreMapper;
 
     @Override
-    public AllenatoreDto addAllenatore(AllenatoreDto allenatore) {
-    
+    public List<AllenatoreDto> addAllenatori(List<AllenatoreDto> allenatore) {
+
         log.info("[START] - [AllenatoreServiceImpl] - addAllenatore");
-    
-        Allenatore a = allenatoreMapper.toModel(allenatore);
-    
+
+        List<Allenatore> a = allenatoreMapper.toModel(allenatore);
+
+        for (Allenatore allenatoreModel : a) {
+            allenatoreModel.setId(null);
+        }
+
         try {
-            allenatoreRepository.save(a);
+            allenatoreRepository.saveAll(a);
         } catch (DataIntegrityViolationException e) {
-            log.error("Error saving Allenatore due to data integrity violation (likely duplicate email): {}", e.getMessage());
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Allenatore con questa email già esistente", 
-                    e 
-            );
+                    "Allenatore con questa email già esistente",
+                    e);
         }
-    
-        log.info("[END] - [AllenatoreServiceImpl] - addAllenatore - Allenatore salvato: {}" , a);
-    
+
+        log.info("[END] - [AllenatoreServiceImpl] - addAllenatore - Allenatore salvato: {}", a);
+
         return allenatoreMapper.toDto(a);
     }
 
     @Override
     public AllenatoreDto updateAllenatore(AllenatoreDto allenatore) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateAllenatore'");
+
+        log.info("[START] - [AllenatoreServiceImpl] - updateAllenatore");
+
+        if (!allenatoreRepository.existsById(allenatore.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Allenatore con id " + allenatore.getId() + " non trovato");
+        }
+
+        Allenatore allenatoreModel = allenatoreMapper.toModel(allenatore);
+
+        allenatoreRepository.save(allenatoreModel);
+
+        log.info("[END] - [AllenatoreServiceImpl] - updateAllenatore - Allenatore aggiornato: {}", allenatore);
+
+        return allenatoreMapper.toDto(allenatoreModel);
     }
 
     @Override
     public Boolean deleteAllenatore(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteAllenatore'");
+
+        log.info("[START] - [AllenatoreServiceImpl] - deleteAllenatore");
+
+        if (!allenatoreRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Allenatore con " + id + " non trovato");
+        }
+
+        allenatoreRepository.deleteById(id);
+
+        log.info("[END] - [AllenatoreServiceImpl] - deleteAllenatore - Allenatore con id {} eliminato", id);
+
+        return true;
     }
 
     @Override
     public AllenatoreDto getAllenatoreById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllenatoreById'");
+        log.info("[START] - [AllenatoreServiceImpl] - getAllenatoreById");
+
+        if (!allenatoreRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Allenatore con id " + id + " non trovato");
+        }
+
+        Allenatore allenatore = allenatoreRepository.findById(id).get();
+
+        log.info("[END] - [AllenatoreServiceImpl] - getAllenatoreById - Allenatore con id {} trovato", id);
+
+        return allenatoreMapper.toDto(allenatore);
     }
 
     @Override
     public List<AllenatoreDto> getAllenatori(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllenatori'");
+        log.info("[START] - [AllenatoreServiceImpl] - getAllenatori");
+
+        if (name == null) {
+            List<Allenatore> allenatori = allenatoreRepository.findAll();
+            log.info("[END] - [AllenatoreServiceImpl] - getAllenatori - Lista di allenatori trovata: {}", allenatori);
+            return allenatoreMapper.toDto(allenatori);
+        }
+
+        List<Allenatore> allenatori = allenatoreRepository.findByNomeContainsIgnoreCase(name);
+        log.info("[END] - [AllenatoreServiceImpl] - getAllenatori - Lista di allenatori trovata: {}", allenatori);
+
+        return allenatoreMapper.toDto(allenatori);
     }
 
 }

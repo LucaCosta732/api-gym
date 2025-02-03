@@ -20,34 +20,28 @@ public class AllenatoreControllerImpl implements AllenatoreController {
     private final AllenatoreService allenatoreService;
 
     @Override
-    public ResponseEntity<AllenatoreDto> getUtenteById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUtenteById'");
+    public ResponseEntity<AllenatoreDto> getAllenatoriById(Long id) {
+        return new ResponseEntity<AllenatoreDto>(allenatoreService.getAllenatoreById(id), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<List<AllenatoreDto>> getUtenti(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUtenti'");
+    public ResponseEntity<List<AllenatoreDto>> getAllenatori(String name) {
+        return new ResponseEntity<List<AllenatoreDto>>(allenatoreService.getAllenatori(name), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<AllenatoreDto> addUtente(AllenatoreDto allenatore) {
-        return new ResponseEntity<AllenatoreDto>(allenatoreService.addAllenatore(allenatore), HttpStatus.CREATED);
+    public ResponseEntity<List<AllenatoreDto>> addAllenatori(List<AllenatoreDto> allenatore) {
+        return new ResponseEntity<List<AllenatoreDto>>(allenatoreService.addAllenatori(allenatore), HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<AllenatoreDto> updateUtente(AllenatoreDto allenatore) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUtente'");
+    public ResponseEntity<AllenatoreDto> updateAllenatore(AllenatoreDto allenatore) {
+        return new ResponseEntity<AllenatoreDto>(allenatoreService.updateAllenatore(allenatore), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Boolean> deleteUtente(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUtente'");
+    public ResponseEntity<Boolean> deleteAllenatore(Long id) {
+        return new ResponseEntity<Boolean>(allenatoreService.deleteAllenatore(id), HttpStatus.OK);
     }
-
-    
 
 }

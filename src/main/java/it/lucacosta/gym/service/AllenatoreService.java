@@ -6,7 +6,7 @@ import it.lucacosta.gym.dto.AllenatoreDto;
 
 public interface AllenatoreService {
 
-    public AllenatoreDto addAllenatore(AllenatoreDto allenatore);
+    public List<AllenatoreDto> addAllenatori(List<AllenatoreDto> allenatore);
     public AllenatoreDto updateAllenatore(AllenatoreDto allenatore);
     public Boolean deleteAllenatore(Long id);
     public AllenatoreDto getAllenatoreById(Long id);

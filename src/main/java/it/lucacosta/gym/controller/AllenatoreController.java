@@ -27,7 +27,7 @@ public interface AllenatoreController {
                         @ApiResponse(responseCode = "404", description = "Allenatore non trovato")
         })
         @GetMapping("/{id}")
-        public ResponseEntity<AllenatoreDto> getUtenteById(
+        public ResponseEntity<AllenatoreDto> getAllenatoriById(
                         @Parameter(description = "ID dell'allenatore da recuperare", required = true) @RequestParam(value = "id") Long id);
 
         @Operation(summary = "Ottieni tutti gli allenatori o filtra per nome", description = "Restituisce una lista di tutti gli allenatori. Opzionalmente, puoi filtrare gli allenatori per nome.")
@@ -35,16 +35,16 @@ public interface AllenatoreController {
                         @ApiResponse(responseCode = "200", description = "Lista degli allenatori restituita con successo")
         })
         @GetMapping("/")
-        public ResponseEntity<List<AllenatoreDto>> getUtenti(
+        public ResponseEntity<List<AllenatoreDto>> getAllenatori(
                         @Parameter(description = "Nome dell'allenatore per filtrare (opzionale)") @RequestParam(value = "name", required = false) String name);
 
-        @Operation(summary = "Aggiungi un nuovo allenatore", description = "Crea e aggiunge un nuovo allenatore al sistema.")
+        @Operation(summary = "Aggiungi nuovi allenatori", description = "Crea e aggiunge nuovi allenatori al sistema.") 
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "201", description = "Allenatore creato con successo"),
                         @ApiResponse(responseCode = "400", description = "Richiesta non valida") 
         })
         @PostMapping("/add")
-        public ResponseEntity<AllenatoreDto> addUtente(@RequestBody AllenatoreDto allenatore); 
+        public ResponseEntity<List<AllenatoreDto>> addAllenatori(@RequestBody List<AllenatoreDto> allenatori); 
 
         @Operation(summary = "Aggiorna un allenatore esistente", description = "Aggiorna i dettagli di un allenatore esistente.")
         @ApiResponses(value = {
@@ -53,7 +53,7 @@ public interface AllenatoreController {
                         @ApiResponse(responseCode = "400", description = "Richiesta non valida") 
         })
         @PutMapping("/update")
-        public ResponseEntity<AllenatoreDto> updateUtente(@RequestBody AllenatoreDto allenatore); 
+        public ResponseEntity<AllenatoreDto> updateAllenatore(@RequestBody AllenatoreDto allenatore); 
 
         @Operation(summary = "Elimina un allenatore", description = "Elimina un allenatore dal sistema tramite il suo ID.")
         @ApiResponses(value = {
@@ -61,5 +61,5 @@ public interface AllenatoreController {
                         @ApiResponse(responseCode = "404", description = "Allenatore non trovato")
         })
         @DeleteMapping("/delete/{id}")
-        public ResponseEntity<Boolean> deleteUtente(@PathVariable Long id); 
+        public ResponseEntity<Boolean> deleteAllenatore(@PathVariable Long id); 
 }
