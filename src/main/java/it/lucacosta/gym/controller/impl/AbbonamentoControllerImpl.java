@@ -13,7 +13,7 @@ import it.lucacosta.gym.service.AbbonamentoService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/abbonamento")
+@RequestMapping("/v1/abbonamento")
 @RequiredArgsConstructor
 public class AbbonamentoControllerImpl implements AbbonamentoController {
         
@@ -22,11 +22,6 @@ public class AbbonamentoControllerImpl implements AbbonamentoController {
     @Override
     public ResponseEntity<AbbonamentoDto> getAbbonamentoById(Long id) {
         return new ResponseEntity<AbbonamentoDto>(abbonamentoService.getAbbonamentoById(id), HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<List<AbbonamentoDto>> getAbbonamenti() {
-        return new ResponseEntity<List<AbbonamentoDto>>(abbonamentoService.getAbbonamenti(), HttpStatus.OK);
     }
 
     @Override
@@ -43,5 +38,27 @@ public class AbbonamentoControllerImpl implements AbbonamentoController {
     public ResponseEntity<Boolean> deleteAbbonamento(Long id) {
         return new ResponseEntity<Boolean>(abbonamentoService.deleteAbbonamento(id), HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<Boolean> controlloValiditaAbbonamento(Long id) {
+        return new ResponseEntity<Boolean>(abbonamentoService.controlloValidita(id), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<List<AbbonamentoDto>> getAbbonamenti(Long userId) {
+        return new ResponseEntity<List<AbbonamentoDto>>(abbonamentoService.getAbbonamenti(userId), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<List<AbbonamentoDto>> controlloAbbonamentiScaduti() {
+        return new ResponseEntity<List<AbbonamentoDto>>(abbonamentoService.controlloAbbonamentiScaduti(), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<AbbonamentoDto> updateAbbonamento(Long id, Long idTipoAbbonamento) {
+        return new ResponseEntity<AbbonamentoDto>(abbonamentoService.updateAbbonamento(id, idTipoAbbonamento), HttpStatus.OK);
+    }
+
+
 
 }

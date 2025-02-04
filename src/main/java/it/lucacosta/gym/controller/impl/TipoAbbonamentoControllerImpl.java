@@ -12,7 +12,7 @@ import it.lucacosta.gym.dto.TipoAbbonamentoDto;
 import it.lucacosta.gym.service.TipoAbbonamentoService;
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/api/v1/tipoAbbonamento")
+@RequestMapping("/v1/tipoAbbonamento")
 @RestController
 @RequiredArgsConstructor
 public class TipoAbbonamentoControllerImpl implements TipoAbbonamentoController {

@@ -13,7 +13,7 @@ import it.lucacosta.gym.service.UtenteService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/utente")
+@RequestMapping("/v1/utente")
 @RequiredArgsConstructor
 public class UtenteControllerImpl implements UtenteController {
 

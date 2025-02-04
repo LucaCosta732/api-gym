@@ -104,16 +104,33 @@ public class AbbonamentoServiceImpl implements AbbonamentoService {
     }
 
     @Override
-    public List<AbbonamentoDto> getAbbonamenti() {
+    public List<AbbonamentoDto> getAbbonamenti(Long userId) {
         log.info("[START] - [AbbonamentoServiceImpl] - getAbbonamenti");
 
+        if (!(userId == null)) {
+
+            Utente utente = utenteRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+            log.info("[END] - [AbbonamentoServiceImpl] - getAbbonamenti - Lista di abbonamenti trovata");
+            List<Abbonamento> abbonamenti = abbonamentoRepository.findByUtente(utente);
+
+            return abbonamentoMapper.toDto(abbonamenti);
+        }
+
         List<Abbonamento> abbonamenti = abbonamentoRepository.findAll();
+
+        for (Abbonamento abbonamento : abbonamenti) {
+            abbonamento.setStato(controlloValidita(abbonamento.getId()));
+        }
+
         log.info("[END] - [AbbonamentoServiceImpl] - getAbbonamenti - Lista di abbonamenti trovata: {}", abbonamenti);
 
         return abbonamentoMapper.toDto(abbonamenti);
     }
 
     private Date calcolaDataInizioFine(Tipo tipo) {
+
         switch (tipo) {
             case ANNUALE:
                 return (Date.valueOf(LocalDate.now().plusYears(1)));
@@ -124,6 +141,66 @@ public class AbbonamentoServiceImpl implements AbbonamentoService {
             default:
                 return null;
         }
+    }
+
+    @Override
+    public Boolean controlloValidita(Long id) {
+
+        log.info("[START] controlloValidita");
+
+        if (!abbonamentoRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Abbonamento non trovato");
+        }
+
+        Abbonamento abbonamento = abbonamentoRepository.findById(id).get();
+
+        if (!abbonamento.getDataFine().toLocalDate().isAfter(LocalDate.now())) {
+            return false;
+        }
+
+        log.info("[EXIT] controlloValidita");
+        return true;
+
+    }
+
+    @Override
+    public List<AbbonamentoDto> controlloAbbonamentiScaduti() {
+
+        List<Abbonamento> list = abbonamentoRepository.findAll();
+
+        for(Abbonamento a : list){
+            a.setStato(controlloValidita(a.getId()));
+        }
+
+        List<Abbonamento> listAggiornata = list.stream().filter(a -> a.getStato() == false).toList();
+        
+        return abbonamentoMapper.toDto(listAggiornata);
+    }
+
+    @Override
+    public AbbonamentoDto updateAbbonamento(Long id, Long idTipoAbbonamento) {
+        log.info("[START] updateAbbonamento"); 
+
+        if(!abbonamentoRepository.existsById(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Abbonamento non trovato");
+        }
+
+        if(!tipoAbbonamentoRepository.existsById(idTipoAbbonamento)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipo Abbonamento non trovato");
+        }
+
+        log.info("[END] updateAbbonamento");
+
+        Abbonamento a = abbonamentoRepository.findById(id).get();
+        TipoAbbonamento tipoAbbonamento = tipoAbbonamentoRepository.findById(idTipoAbbonamento).get();
+
+        a.setTipo(tipoAbbonamento);
+
+        abbonamentoRepository.save(a);
+
+        log.info("[END] updateAbbonamento - Abbonamento aggiornato: {}", a);
+
+        return abbonamentoMapper.toDto(a);
     }
 
 }

@@ -13,7 +13,7 @@ import it.lucacosta.gym.service.AllenatoreService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/allenatore")
+@RequestMapping("/v1/allenatore")
 @RequiredArgsConstructor
 public class AllenatoreControllerImpl implements AllenatoreController {
 
