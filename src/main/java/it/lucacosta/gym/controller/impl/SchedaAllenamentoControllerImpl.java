@@ -22,8 +22,8 @@ public class SchedaAllenamentoControllerImpl implements SchedaAllenamentoControl
 
     @Override
     public ResponseEntity<SchedaAllenamentoResponse> getSchedaAllenamentoById(Long id) {
-       return new ResponseEntity<SchedaAllenamentoResponse>(
-               schedaAllenamentoService.getSchedaAllenamentoById(id), HttpStatus.OK);
+        return new ResponseEntity<SchedaAllenamentoResponse>(
+                schedaAllenamentoService.getSchedaAllenamentoById(id), HttpStatus.OK);
     }
 
     @Override
@@ -41,11 +41,17 @@ public class SchedaAllenamentoControllerImpl implements SchedaAllenamentoControl
     }
 
     @Override
-    public ResponseEntity<SchedaAllenamentoResponse> updateExercises(Long id, List<Long> eserciziDaAggiungere,
+    public ResponseEntity<SchedaAllenamentoResponse> updateEserciziDaAggiungere(Long id,
+            List<Long> eserciziDaAggiungere) {
+        return new ResponseEntity<SchedaAllenamentoResponse>(
+                schedaAllenamentoService.updateAggiungiEsercizi(id, eserciziDaAggiungere), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<SchedaAllenamentoResponse> updateEserciziDaRimuovere(Long id,
             List<Long> eserciziDaRimuovere) {
         return new ResponseEntity<SchedaAllenamentoResponse>(
-                schedaAllenamentoService.updateExercises(id, eserciziDaAggiungere, eserciziDaRimuovere),
-                HttpStatus.OK);
+                schedaAllenamentoService.updateRimuoviEsercizi(id, eserciziDaRimuovere), HttpStatus.OK);
     }
 
     @Override

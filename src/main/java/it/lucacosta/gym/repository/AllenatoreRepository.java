@@ -12,6 +12,10 @@ public interface AllenatoreRepository extends JpaRepository<Allenatore, Long> {
     Allenatore findByEmail(String email);
     Optional<List<Allenatore>> findByNome(String nome);
     Optional<List<Allenatore>> findByCognome(String cognome);
-    List<Allenatore> findByNomeContainsIgnoreCase(String name);
+    List<Allenatore> findAllByNomeContainsIgnoreCaseAndEliminatoFalse(String name);
+    List<Allenatore> findAllByEliminatoFalse();
+    Boolean existsByIdAndEliminatoFalse(Long id);
+    Optional<Allenatore> findByIdAndEliminatoFalse(Long id);
+
 
 }

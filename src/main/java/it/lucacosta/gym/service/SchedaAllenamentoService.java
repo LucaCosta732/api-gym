@@ -13,8 +13,9 @@ public interface SchedaAllenamentoService {
     public SchedaAllenamentoResponse createSchedaAllenamento(Long utenteId, Long allenatoreId,
            SchedaAllenamentoRequest schedaAllenamentoRequest);
 
-    public SchedaAllenamentoResponse updateExercises(Long id, List<Long> eserciziDaAggiungere,
-            List<Long> eserciziDaRimuovere);
+    public SchedaAllenamentoResponse updateAggiungiEsercizi(Long id, List<Long> eserciziDaAggiungere);
+    
+    public SchedaAllenamentoResponse updateRimuoviEsercizi(Long id, List<Long> eserciziDaRimuovere);
 
     public SchedaAllenamentoResponse updateAllenatore(Long id, Long nuovoAllenatoreId);
 

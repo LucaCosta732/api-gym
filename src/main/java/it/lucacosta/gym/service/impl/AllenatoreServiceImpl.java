@@ -1,12 +1,16 @@
 package it.lucacosta.gym.service.impl;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import it.lucacosta.gym.dto.AllenatoreDto;
-import it.lucacosta.gym.mapper.AllenatoreMapper;
+import it.lucacosta.gym.dto.request.AllenatoreRequest;
+import it.lucacosta.gym.dto.response.AllenatoreResponse;
+import it.lucacosta.gym.mapper.DtoMapper;
+import it.lucacosta.gym.mapper.ModelMapper;
 import it.lucacosta.gym.model.Allenatore;
 import it.lucacosta.gym.repository.AllenatoreRepository;
 import it.lucacosta.gym.service.AllenatoreService;
@@ -19,97 +23,89 @@ import lombok.extern.slf4j.Slf4j;
 public class AllenatoreServiceImpl implements AllenatoreService {
 
     private final AllenatoreRepository allenatoreRepository;
-    private final AllenatoreMapper allenatoreMapper;
+    private final ModelMapper modelMapper;
+    private final DtoMapper dtoMapper;
 
     @Override
-    public List<AllenatoreDto> addAllenatori(List<AllenatoreDto> allenatore) {
+    public List<AllenatoreResponse> addAllenatori(List<AllenatoreRequest> allenatoreRequests) {
+        log.info("[START] - [AllenatoreServiceImpl] - addAllenatori");
 
-        log.info("[START] - [AllenatoreServiceImpl] - addAllenatore");
-
-        List<Allenatore> a = allenatoreMapper.toModel(allenatore);
-
-        for (Allenatore allenatoreModel : a) {
-            allenatoreModel.setId(null);
+        if (allenatoreRequests == null || allenatoreRequests.isEmpty()) {
+            log.warn("No Allenatori requests provided.");
+            return List.of();
         }
 
-        allenatoreRepository.saveAll(a);
+        List<Allenatore> allenatoriToSave = modelMapper.toModel_A(allenatoreRequests);
+        allenatoriToSave.forEach(allenatore -> {
+            allenatore.setId(null);
+            allenatore.setEliminato(false);
+        });
 
-        log.info("[END] - [AllenatoreServiceImpl] - addAllenatore - Allenatore salvato: {}", a);
+        List<Allenatore> savedAllenatori = allenatoreRepository.saveAll(allenatoriToSave);
 
-        return allenatoreMapper.toDto(a);
+        log.info("[END] - [AllenatoreServiceImpl] - addAllenatori - Saved {} Allenatori", savedAllenatori.size());
+        return dtoMapper.toResponse_A(savedAllenatori);
     }
 
     @Override
-    public AllenatoreDto updateAllenatore(AllenatoreDto allenatore) {
+    public AllenatoreResponse updateAllenatore(Long id, AllenatoreRequest allenatoreRequest) {
+        log.info("[START] - [AllenatoreServiceImpl] - updateAllenatore - ID: {}", id);
 
-        log.info("[START] - [AllenatoreServiceImpl] - updateAllenatore");
+        Allenatore existingAllenatore = findActiveAllenatoreById(id);
 
-        if (!allenatoreRepository.existsById(allenatore.getId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Allenatore con id " + allenatore.getId() + " non trovato");
-        }
+        modelMapper.updateModelFromDto(allenatoreRequest, existingAllenatore);
+        existingAllenatore.setEliminato(false);
 
-        Allenatore allenatoreModel = allenatoreMapper.toModel(allenatore);
+        Allenatore updatedAllenatore = allenatoreRepository.save(existingAllenatore);
 
-        allenatoreRepository.save(allenatoreModel);
-
-        log.info("[END] - [AllenatoreServiceImpl] - updateAllenatore - Allenatore aggiornato: {}", allenatore);
-
-        return allenatoreMapper.toDto(allenatoreModel);
+        log.info("[END] - [AllenatoreServiceImpl] - updateAllenatore - ID: {} - Allenatore updated", id);
+        return dtoMapper.toResponse(updatedAllenatore);
     }
 
     @Override
     public Boolean deleteAllenatore(Long id) {
+        log.info("[START] - [AllenatoreServiceImpl] - deleteAllenatore - ID: {}", id);
 
-        log.info("[START] - [AllenatoreServiceImpl] - deleteAllenatore");
+        Allenatore allenatoreToDelete = findActiveAllenatoreById(id);
 
-        if (!allenatoreRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Allenatore con " + id + " non trovato");
-        }
+        allenatoreToDelete.setEliminato(true);
+        allenatoreRepository.save(allenatoreToDelete);
 
-        allenatoreRepository.deleteById(id);
-
-        log.info("[END] - [AllenatoreServiceImpl] - deleteAllenatore - Allenatore con id {} eliminato", id);
-
+        log.info("[END] - [AllenatoreServiceImpl] - deleteAllenatore - ID: {} - Allenatore soft deleted", id);
         return true;
     }
 
     @Override
-    public AllenatoreDto getAllenatoreById(Long id) {
-        log.info("[START] - [AllenatoreServiceImpl] - getAllenatoreById");
+    public AllenatoreResponse getAllenatoreById(Long id) {
+        log.info("[START] - [AllenatoreServiceImpl] - getAllenatoreById - ID: {}", id);
 
-        if (!allenatoreRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Allenatore con id " + id + " non trovato");
-        }
+        Allenatore allenatore = findActiveAllenatoreById(id);
 
-        Allenatore allenatore = allenatoreRepository.findById(id).get();
-
-        log.info("[END] - [AllenatoreServiceImpl] - getAllenatoreById - Allenatore con id {} trovato", id);
-
-        return allenatoreMapper.toDto(allenatore);
+        log.info("[END] - [AllenatoreServiceImpl] - getAllenatoreById - ID: {} - Allenatore found", id);
+        return dtoMapper.toResponse(allenatore);
     }
 
     @Override
-    public List<AllenatoreDto> getAllenatori(String name) {
-        log.info("[START] - [AllenatoreServiceImpl] - getAllenatori");
+    public List<AllenatoreResponse> getAllenatori(String name) {
+        log.info("[START] - [AllenatoreServiceImpl] - getAllenatori - Name filter: {}", name);
 
-        if (name == null) {
-            List<Allenatore> allenatori = allenatoreRepository.findAll();
-            log.info("[END] - [AllenatoreServiceImpl] - getAllenatori - Lista di allenatori trovata: {}", allenatori);
-            return allenatoreMapper.toDto(allenatori);
+        List<Allenatore> allenatori;
+        if (name == null || name.trim().isEmpty()) {
+            log.debug("Fetching all active Allenatori.");
+            allenatori = allenatoreRepository.findAllByEliminatoFalse();
+        } else {
+            log.debug("Fetching active Allenatori filtered by name: {}", name);
+            allenatori = allenatoreRepository.findAllByNomeContainsIgnoreCaseAndEliminatoFalse(name);
         }
 
-        List<Allenatore> allenatori = allenatoreRepository.findByNomeContainsIgnoreCase(name);
-        log.info("[END] - [AllenatoreServiceImpl] - getAllenatori - Lista di allenatori trovata: {}", allenatori);
-
-        return allenatoreMapper.toDto(allenatori);
+        log.info("[END] - [AllenatoreServiceImpl] - getAllenatori - Found {} Allenatori", allenatori.size());
+        return dtoMapper.toResponse_A(allenatori);
     }
 
-    
-
+    private Allenatore findActiveAllenatoreById(Long id) {
+        log.debug("Finding active Allenatore by ID: {}", id);
+        Optional<Allenatore> allenatoreOptional = allenatoreRepository.findByIdAndEliminatoFalse(id);
+        return allenatoreOptional.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Allenatore con ID " + id + " non trovato"));
+    }
 }

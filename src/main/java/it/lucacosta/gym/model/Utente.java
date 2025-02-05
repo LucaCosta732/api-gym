@@ -2,6 +2,8 @@ package it.lucacosta.gym.model;
 
 import java.sql.Date;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,4 +43,8 @@ public class Utente {
 
     @Column(name = "TELEFONO", nullable = true)
     private String telefono;
+
+    @Column(name = "FLAG_ELIMINATO")
+    @ColumnDefault(value = "false")
+    private Boolean eliminato = false;
 }

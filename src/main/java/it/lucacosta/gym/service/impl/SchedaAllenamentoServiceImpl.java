@@ -4,15 +4,15 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import it.lucacosta.gym.dto.SchedaAllenamentoDto;
 import it.lucacosta.gym.dto.request.SchedaAllenamentoRequest;
-import it.lucacosta.gym.mapper.SchedaAllenamentoMapper;
+import it.lucacosta.gym.dto.response.SchedaAllenamentoResponse;
+import it.lucacosta.gym.mapper.DtoMapper;
 import it.lucacosta.gym.model.Allenatore;
 import it.lucacosta.gym.model.Esercizio;
 import it.lucacosta.gym.model.SchedaAllenamento;
@@ -34,117 +34,153 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
     private final UtenteRepository utenteRepository;
     private final AllenatoreRepository allenatoreRepository;
     private final EsercizioRepository esercizioRepository;
-    private final SchedaAllenamentoMapper schedaAllenamentoMapper;
+    private final DtoMapper dtoMapper;
 
     @Override
-    public SchedaAllenamentoDto getSchedaAllenamentoById(Long id) {
-        log.info("[START] - [SchedaAllenamentoServiceImpl] - getSchedaAllenamentoById");
-
-        if (!schedaAllenamentoRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Scheda allenamento non trovata");
-        }
-
-        SchedaAllenamento s = schedaAllenamentoRepository.findById(id).get();
-
-        log.info("[END] - [SchedaAllenamentoServiceImpl] - getSchedaAllenamentoById - Scheda allenamento trovata: {}",
-                s);
-
-        return schedaAllenamentoMapper.toDto(s);
+    public SchedaAllenamentoResponse getSchedaAllenamentoById(Long id) {
+        log.info("[START] getSchedaAllenamentoById");
+        SchedaAllenamento schedaAllenamento = findActiveSchedaAllenamentoById(id);
+        log.info("[END] getSchedaAllenamentoById");
+        return dtoMapper.toResponse(schedaAllenamento);
     }
 
     @Override
-    public List<SchedaAllenamentoDto> getAllSchedeAllenamento() {
-        log.info("[START] - [SchedaAllenamentoServiceImpl] - getAllSchedeAllenamento");
-
-        List<SchedaAllenamento> s = schedaAllenamentoRepository.findAll();
-
-        log.info(
-                "[END] - [SchedaAllenamentoServiceImpl] - getAllSchedeAllenamento - Lista di schede allenamento trovata: {}",
-                s);
-
-        return schedaAllenamentoMapper.toDto(s);
+    public List<SchedaAllenamentoResponse> getAllSchedeAllenamento() {
+        log.info("[START] getAllSchedeAllenamento");
+        List<SchedaAllenamento> schedaAllenamenti = schedaAllenamentoRepository.findAllByEliminatoFalse();
+        log.info("[END] getAllSchedeAllenamento");
+        return dtoMapper.toResponse_SA(schedaAllenamenti);
     }
 
     @Override
-    public SchedaAllenamentoDto createSchedaAllenamento(Long utenteId, Long allenatoreId,
+    public SchedaAllenamentoResponse createSchedaAllenamento(Long utenteId, Long allenatoreId,
             SchedaAllenamentoRequest schedaAllenamentoRequest) {
-        log.info("[START] - [SchedaAllenamentoServiceImpl] - createSchedaAllenamento");
+        log.info("[START] createSchedaAllenamento");
+        Utente utente = findActiveUtenteById(utenteId);
+        Allenatore allenatore = findActiveAllenatoreById(allenatoreId);
 
-        Utente u = utenteRepository.findById(utenteId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utente con id " + utenteId + " non trovato"));
-
-        Allenatore a = allenatoreRepository.findById(allenatoreId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Allenatore con id " + allenatoreId + " non trovato"));
-
-        List<Esercizio> list = new ArrayList<Esercizio>();
-
-        for (Long esercizioId : schedaAllenamentoRequest.getEsercizioID()) {
-            Esercizio e = esercizioRepository.findById(esercizioId).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Esercizio con id " + esercizioId + " non trovato"));
-
-            list.add(e);
-        }
-
-        SchedaAllenamento s = new SchedaAllenamento();
-        s.setNome(schedaAllenamentoRequest.getNome());
-        s.setUtente(u);
-        s.setAllenatore(a);
-        s.setEsercizio(list);
-        s.setDataCreazione(Date.valueOf(LocalDate.now()));
-        s.setDataFine(Date.valueOf(LocalDate.now().plusMonths(1)));
-        s.setStato(true);
-
+        SchedaAllenamento s = createScheda(allenatore, utente, schedaAllenamentoRequest);
         schedaAllenamentoRepository.save(s);
 
-        log.info("[END] - [SchedaAllenamentoServiceImpl] - createSchedaAllenamento - Scheda allenamento creata: {}",
-                s);
+        log.info("[END] createSchedaAllenamento");
 
-        return schedaAllenamentoMapper.toDto(s);
+        return dtoMapper.toResponse(s);
+
     }
 
     @Override
-    public SchedaAllenamentoDto updateExercises(Long id, List<Long> eserciziDaAggiungere,
-            List<Long> eserciziDaRimuovere) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateExercises'");
+    public SchedaAllenamentoResponse updateAggiungiEsercizi(Long id, List<Long> eserciziDaAggiungere) {
+        log.info("[START] updateAggiungiEsercizi");
+        SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
+        List<Esercizio> eserciziDaAggiungereList = esercizioRepository.findAllById(eserciziDaAggiungere);
+        s.getEsercizio().addAll(eserciziDaAggiungereList);
+        schedaAllenamentoRepository.save(s);
+        log.info("[END] updateAggiungiEsercizi");
+        return dtoMapper.toResponse(s);
     }
 
     @Override
-    public SchedaAllenamentoDto updateAllenatore(Long id, Long nuovoAllenatoreId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateAllenatore'");
+    public SchedaAllenamentoResponse updateRimuoviEsercizi(Long id, List<Long> eserciziDaRimuovere) {
+        log.info("[START] updateRimuoviEsercizi");
+        SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
+        List<Esercizio> eserciziDaAggiungereList = esercizioRepository.findAllById(eserciziDaRimuovere);
+        s.getEsercizio().removeAll(eserciziDaAggiungereList);
+        schedaAllenamentoRepository.save(s);
+        log.info("[END] updateRimuoviEsercizi");
+        return dtoMapper.toResponse(s);
     }
 
     @Override
-    public SchedaAllenamentoDto updateSchedaAllenamento(SchedaAllenamentoDto schedaAllenamento) {
-        log.info("[START] - [SchedaAllenamentoServiceImpl] - updateSchedaAllenamento");
+    public SchedaAllenamentoResponse updateAllenatore(Long id, Long nuovoAllenatoreId) {
+        log.info("[START] updateAllenatore");
+        Allenatore a = findActiveAllenatoreById(nuovoAllenatoreId);
+        SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
+        s.setAllenatore(a);
+        schedaAllenamentoRepository.save(s);
+        log.info("[END] updateAllenatore");
+        return dtoMapper.toResponse(s);
+    }
 
-        if (!schedaAllenamentoRepository.existsById(schedaAllenamento.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Scheda allenamento con id " + schedaAllenamento.getId() + " non trovata");
-        }
+    @Override
+    public SchedaAllenamentoResponse updateSchedaAllenamento(SchedaAllenamentoRequest schedaAllenamento, Long id) {
+        log.info("[START] - updateSchedaAllenamento");
+        SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
+        s.setNome(schedaAllenamento.getNome());
+        s.setDataFine(schedaAllenamento.getDataFine());
+        List<Esercizio> list = findEserciziById(schedaAllenamento.getEsercizioID());
+        s.setEsercizio(list);
+        schedaAllenamentoRepository.save(s);
+        log.info("[END] - updateSchedaAllenamento");
+        return dtoMapper.toResponse(s);
 
-        return null;
     }
 
     @Override
     public Boolean deleteSchedaAllenamento(Long id) {
-        log.info("[START] - [SchedaAllenamentoServiceImpl] - deleteSchedaAllenamento");
+        log.info("[START] - deleteSchedaAllenamento");
+        SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
+        s.setEliminato(true);
+        schedaAllenamentoRepository.save(s);
+        log.info("[END] - deleteSchedaAllenamento");
+        return true;
+    }
 
-        if (!schedaAllenamentoRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Scheda allenamento non trovata");
+    public SchedaAllenamento findActiveSchedaAllenamentoById(Long id) {
+        log.debug("Trovo Scheda Esercizio by ID: {}", id);
+        Optional<SchedaAllenamento> sOptional = schedaAllenamentoRepository.findByIdAndEliminatoFalse(id);
+        return sOptional.orElseThrow(() -> {
+            return new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Esercizio con id " + id + " non trovato o non attivo.");
+        });
+    }
+
+    private Esercizio findActiveEsercizioById(Long id) {
+        log.debug("Finding active Esercizio by ID: {}", id);
+        Optional<Esercizio> esercizioOptional = esercizioRepository.findByIdAndEliminatoFalse(id);
+        return esercizioOptional.orElseThrow(() -> {
+            return new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Esercizio con id " + id + " non trovato o non attivo.");
+        });
+    }
+
+    private Allenatore findActiveAllenatoreById(Long id) {
+        log.debug("Finding active Allenatore by ID: {}", id);
+        Optional<Allenatore> allenatoreOptional = allenatoreRepository.findByIdAndEliminatoFalse(id);
+        return allenatoreOptional.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Allenatore con ID " + id + " non trovato"));
+    }
+
+    private Utente findActiveUtenteById(Long id) {
+        log.debug("Trova Utente by ID: {}", id);
+        Optional<Utente> utenteOptional = utenteRepository.findByIdAndEliminatoFalse(id);
+        return utenteOptional.orElseThrow(() -> {
+            return new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Utente con id " + id + " non trovato o non attivo.");
+        });
+    }
+
+    private SchedaAllenamento createScheda(Allenatore a, Utente u, SchedaAllenamentoRequest s) {
+        List<Esercizio> listaEsercizi = findEserciziById(s.getEsercizioID());
+
+        SchedaAllenamento schedaAllenamento = new SchedaAllenamento();
+        schedaAllenamento.setNome(s.getNome());
+        schedaAllenamento.setAllenatore(a);
+        schedaAllenamento.setUtente(u);
+        schedaAllenamento.setDataCreazione(Date.valueOf(LocalDate.now()));
+        schedaAllenamento.setDataFine(s.getDataFine());
+        schedaAllenamento.setEsercizio(listaEsercizi);
+
+        return schedaAllenamento;
+    }
+
+    private List<Esercizio> findEserciziById(List<Long> esercizioID) {
+        List<Esercizio> listaEsercizi = new ArrayList<>();
+        for (Long esercizioId : esercizioID) {
+            Esercizio e = findActiveEsercizioById(esercizioId);
+            listaEsercizi.add(e);
         }
 
-        SchedaAllenamento s = schedaAllenamentoRepository.findById(id).get();
-
-        schedaAllenamentoRepository.deleteById(id);
-
-        log.info("[END] - [SchedaAllenamentoServiceImpl] - deleteSchedaAllenamento - Scheda allenamento eliminata: {}",
-                s);
-
-        return true;
+        return listaEsercizi;
     }
 
 }

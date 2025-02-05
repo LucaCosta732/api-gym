@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,8 +17,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.lucacosta.gym.dto.request.AbbonamentoRequest;
 import it.lucacosta.gym.dto.response.AbbonamentoResponse;
+import it.lucacosta.gym.model.Abbonamento.Stato;
 
 @Tag(name = "Abbonamento", description = "API per gestire gli abbonamenti degli utenti")
 public interface AbbonamentoController {
@@ -51,23 +50,12 @@ public interface AbbonamentoController {
             @Parameter(description = "ID del tipo di abbonamento", required = true) @RequestParam Long idTipo,
             @Parameter(description = "ID dell'utente associato all'abbonamento", required = true) @RequestParam Long idUtente);
 
-    @Operation(summary = "Aggiorna un abbonamento esistente", description = "Aggiorna i dettagli di un abbonamento esistente.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Abbonamento aggiornato con successo", content = @Content(schema = @Schema(implementation = AbbonamentoResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Abbonamento non trovato"),
-            @ApiResponse(responseCode = "400", description = "Richiesta non valida")
-    })
-    @PutMapping("/update/{id}")
-    public ResponseEntity<AbbonamentoResponse> updateAbbonamento(
-            @Parameter(description = "ID dell'abbonamento da aggiornare", required = true) @PathVariable Long id,
-            @Parameter(description = "Dettagli aggiornati dell'abbonamento", required = true) @RequestBody AbbonamentoRequest abbonamento);
-
     @Operation(summary = "Controlla validità abbonamento", description = "Verifica se un abbonamento è valido (attivo) in base alla data corrente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Validità dell'abbonamento verificata con successo")
     })
     @GetMapping("/controlloValidita/{id}")
-    public ResponseEntity<Boolean> controlloValiditaAbbonamento(
+    public ResponseEntity<Stato> controlloValiditaAbbonamento(
             @Parameter(description = "ID dell'abbonamento da controllare", required = true) @PathVariable Long id);
 
     @Operation(summary = "Elimina un abbonamento", description = "Elimina un abbonamento dal sistema tramite il suo ID.")
@@ -94,7 +82,7 @@ public interface AbbonamentoController {
             @ApiResponse(responseCode = "404", description = "Abbonamento non trovato"),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
-    @PutMapping("/updateWithParams/{id}")
+    @PutMapping("/attivaAbbonamento/{id}")
     public ResponseEntity<AbbonamentoResponse> updateAbbonamento(
         @Parameter(description = "ID dell'abbonamento da aggiornare", required = true) @PathVariable Long id,
         @Parameter(description = "ID tipo abbonamento", required = true) @RequestParam(value = "idTipoAbbonamento", required = true) Long idTipoAbbonamento

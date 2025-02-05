@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class SchedaAllenamentoRequest {
 
     private String nome;
-    private Date dataCreazione;
+    private Date dataFine;
     private List<Long> esercizioID;
 }

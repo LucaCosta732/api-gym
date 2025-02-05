@@ -36,4 +36,7 @@ public class Allenatore {
 
     @Column(name = "TELEFONO" , nullable = true)
     private String telefono;
+
+    @Column(name = "FLAG_ELIMINATO")
+    private Boolean eliminato = false;
 }

@@ -1,11 +1,16 @@
 package it.lucacosta.gym.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import it.lucacosta.gym.dto.UtenteDto;
-import it.lucacosta.gym.mapper.UtenteMapper;
+import it.lucacosta.gym.dto.request.UtenteRequest;
+import it.lucacosta.gym.dto.response.UtenteResponse;
+import it.lucacosta.gym.mapper.DtoMapper;
+import it.lucacosta.gym.mapper.ModelMapper;
 import it.lucacosta.gym.model.Utente;
 import it.lucacosta.gym.repository.UtenteRepository;
 import it.lucacosta.gym.service.UtenteService;
@@ -18,90 +23,104 @@ import lombok.extern.slf4j.Slf4j;
 public class UtenteServiceImpl implements UtenteService {
 
     private final UtenteRepository utenteRepository;
-    private final UtenteMapper utenteMapper;
+    private final ModelMapper utenteMapper; 
+    private final DtoMapper dtoMapper;
 
     @Override
-    public List<UtenteDto> addUtenti(List<UtenteDto> utenti) {
-
+    public List<UtenteResponse> addUtenti(List<UtenteRequest> utentiRequests) {
         log.info("[START] - [UtenteServiceImpl] - addUtenti");
 
-        List<Utente> utentiModel = utenteMapper.toModel(utenti);
-
-        for (Utente utenteModel : utentiModel) {
-            utenteModel.setId(null);
+        if (utentiRequests == null || utentiRequests.isEmpty()) {
+            log.warn("No Utenti requests provided.");
+            return List.of(); 
         }
 
-        utenteRepository.saveAll(utentiModel);
+        List<Utente> utentiToSave = utenteMapper.toModel_U(utentiRequests);
+        utentiToSave.forEach(utente -> {
+            utente.setId(null);
+            utente.setEliminato(false);
+        });
 
-        log.info("[END] - [UtenteServiceImpl] - addUtenti - Utente salvato: {}", utentiModel);
+        List<Utente> savedUtenti = utenteRepository.saveAll(utentiToSave);
 
-        return utenteMapper.toDto(utentiModel);
+        log.info("[END] - [UtenteServiceImpl] - addUtenti - Saved {} Utenti", savedUtenti.size());
+        return dtoMapper.toResponse_U(savedUtenti);
     }
 
     @Override
-    public UtenteDto updateUtente(UtenteDto utente) {
+    public UtenteResponse addUtente(UtenteRequest utenteRequest) {
+        log.info("[START] - [UtenteServiceImpl] - addUtente");
 
-        log.info("[START] - [UtenteServiceImpl] - updateUtente");
+        Utente utenteToSave = utenteMapper.toModel(utenteRequest);
+        utenteToSave.setId(null);
+        utenteToSave.setEliminato(false);
 
-        if (!utenteRepository.existsById(utente.getId())) {
-            throw new RuntimeException("Utente con id " + utente.getId() + " non trovato");
-        }
+        Utente savedUtente = utenteRepository.save(utenteToSave);
 
-        Utente utenteModel = utenteMapper.toModel(utente);
+        log.info("[END] - [UtenteServiceImpl] - addUtente - Utente ID: {} created", savedUtente.getId());
+        return dtoMapper.toResponse(savedUtente);
+    }
 
-        utenteRepository.save(utenteModel);
+    @Override
+    public UtenteResponse updateUtente(UtenteRequest utenteRequest, Long id) {
+        log.info("[START] - [UtenteServiceImpl] - updateUtente - ID: {}", id);
 
-        log.info("[END] - [UtenteServiceImpl] - updateUtente - Utente aggiornato: {}", utente);
+        Utente existingUtente = findActiveUtenteById(id);
 
-        return utenteMapper.toDto(utenteModel);
+        utenteMapper.updateModelFromDto(utenteRequest, existingUtente);
+
+        Utente updatedUtente = utenteRepository.save(existingUtente);
+
+        log.info("[END] - [UtenteServiceImpl] - updateUtente - ID: {} - Utente updated", id);
+        return dtoMapper.toResponse(updatedUtente);
     }
 
     @Override
     public Boolean deleteUtente(Long id) {
+        log.info("[START] - [UtenteServiceImpl] - deleteUtente - ID: {}", id);
 
-        log.info("[START] - [UtenteServiceImpl] - deleteUtente");
+        Utente utenteToDelete = findActiveUtenteById(id);
 
-        if (!utenteRepository.existsById(id)) {
-            throw new RuntimeException("Utente con id " + id + " non trovato");
-        }
+        utenteToDelete.setEliminato(true); 
+        utenteRepository.save(utenteToDelete);
 
-        utenteRepository.deleteById(id);
-
-        log.info("[END] - [UtenteServiceImpl] - deleteUtente - Utente con id {} eliminato", id);
-
+        log.info("[END] - [UtenteServiceImpl] - deleteUtente - ID: {} - Utente soft deleted", id);
         return true;
     }
 
     @Override
-    public UtenteDto getUtenteById(Long id) {
+    public UtenteResponse getUtenteById(Long id) {
+        log.info("[START] - [UtenteServiceImpl] - getUtenteById - ID: {}", id);
 
-        log.info("[START] - [UtenteServiceImpl] - getUtenteById");
+        Utente utente = findActiveUtenteById(id);
 
-        if (!utenteRepository.existsById(id)) {
-            throw new RuntimeException("Utente con id " + id + " non trovato");
-        }
-
-        Utente utente = utenteRepository.findById(id).get();
-
-        log.info("[END] - [UtenteServiceImpl] - getUtenteById - Utente con id {} trovato", id);
-
-        return utenteMapper.toDto(utente);
+        log.info("[END] - [UtenteServiceImpl] - getUtenteById - ID: {} - Utente found", id);
+        return dtoMapper.toResponse(utente);
     }
 
     @Override
-    public List<UtenteDto> getUtenti(String name) {
-        
-        log.info("[START] - [UtenteServiceImpl] - getUtenti");
+    public List<UtenteResponse> getUtenti(String name) {
+        log.info("[START] - [UtenteServiceImpl] - getUtenti - Name filter: {}", name);
 
-        if (name == null) {
-            List<Utente> utenti = utenteRepository.findAll();
-            log.info("[END] - [UtenteServiceImpl] - getUtenti - Lista di utenti trovata: {}", utenti);
-            return utenteMapper.toDto(utenti);
+        List<Utente> utenti;
+        if (name == null || name.trim().isEmpty()) {
+            log.debug("Fetching all active Utenti.");
+            utenti = utenteRepository.findAllByEliminatoFalse();
+        } else {
+            log.debug("Fetching active Utenti filtered by name: {}", name);
+            utenti = utenteRepository.findAllByNomeContainsIgnoreCaseAndEliminatoFalse(name);
         }
 
-        List<Utente> utenti = utenteRepository.findAllByNomeContainsIgnoreCase(name);
-        log.info("[END] - [UtenteServiceImpl] - getUtenti - Lista di utenti trovata: {}", utenti);
+        log.info("[END] - [UtenteServiceImpl] - getUtenti - Found {} Utenti", utenti.size());
+        return dtoMapper.toResponse_U(utenti);
+    }
 
-        return utenteMapper.toDto(utenti);
+    private Utente findActiveUtenteById(Long id) {
+        log.debug("Trova Utente by ID: {}", id);
+        Optional<Utente> utenteOptional = utenteRepository.findByIdAndEliminatoFalse(id);
+        return utenteOptional.orElseThrow(() -> {
+            return new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Utente con id " + id + " non trovato o non attivo.");
+        });
     }
 }

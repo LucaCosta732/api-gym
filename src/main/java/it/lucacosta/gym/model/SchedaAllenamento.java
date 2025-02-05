@@ -54,4 +54,7 @@ public class SchedaAllenamento {
     @JoinTable(name = "ESERCIZIO_SCHDA_ALLENAMENTO")
     private List<Esercizio> esercizio;
 
+    @Column(name = "FLAG_ELIMINATO")
+    private Boolean eliminato = false;
+
 }

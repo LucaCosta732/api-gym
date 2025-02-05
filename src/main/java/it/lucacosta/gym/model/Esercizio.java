@@ -34,4 +34,7 @@ public class Esercizio {
     @Column(name = "ATTREZZATURA" , nullable = true)
     private String attrezzatura;
 
+    @Column(name = "FLAG_ELIMINATO")
+    private Boolean eliminato = false;
+
 }

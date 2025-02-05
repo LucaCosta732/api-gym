@@ -10,5 +10,8 @@ import it.lucacosta.gym.model.Esercizio;
 public interface EsercizioRepository extends JpaRepository<Esercizio, Long> {
 
     Optional<List<Esercizio>> findByNome(String nome);
+    List<Esercizio> findAllByEliminatoFalse();
+    Optional<Esercizio> findByIdAndEliminatoFalse(Long id);
+    Boolean existsByIdAndEliminatoFalse(Long id);
 
 }

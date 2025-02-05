@@ -18,6 +18,13 @@ public class AbbonamentoResponse {
     private UtenteDto utente;
     private Date dataInizio;
     private Date dataFine;
-    private Boolean stato;
+    private Stato stato;
+
+    public enum Stato{
+        ATTIVO,
+        SCADUTO,
+        IN_ATTESA
+    }
+    
 
 }

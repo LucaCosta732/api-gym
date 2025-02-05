@@ -34,6 +34,9 @@ public class TipoAbbonamento {
     @Column(name = "PREZZO")
     private Double prezzo;
 
+    @Column(name = "FLAG_ELIMINATO")
+    private Boolean eliminato = false;
+
 
     public enum Tipo{
         ANNUALE,
