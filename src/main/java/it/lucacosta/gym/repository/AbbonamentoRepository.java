@@ -10,5 +10,6 @@ import it.lucacosta.gym.model.Utente;
 public interface AbbonamentoRepository extends JpaRepository<Abbonamento, Long> {
 
     public List<Abbonamento> findByUtente(Utente utente);
+    public Boolean existsByUtente(Utente utente);
     
 }

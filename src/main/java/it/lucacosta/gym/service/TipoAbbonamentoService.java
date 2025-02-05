@@ -1,15 +1,15 @@
 package it.lucacosta.gym.service;
 
 import java.util.List;
-
-import it.lucacosta.gym.dto.TipoAbbonamentoDto;
+import it.lucacosta.gym.dto.request.TipoAbbonamentoRequest;
+import it.lucacosta.gym.dto.response.TipoAbbonamentoResponse;
 
 public interface TipoAbbonamentoService {
 
-    public TipoAbbonamentoDto addTipoAbbonamento(TipoAbbonamentoDto tipoAbbonamento);
-    public TipoAbbonamentoDto updateTipoAbbonamento(TipoAbbonamentoDto tipoAbbonamento);
+    public TipoAbbonamentoResponse addTipoAbbonamento(TipoAbbonamentoRequest tipoAbbonamento);
+    public TipoAbbonamentoResponse updateTipoAbbonamento(TipoAbbonamentoRequest tipoAbbonamento, Long id);
     public Boolean deleteTipoAbbonamento(Long id);
-    public TipoAbbonamentoDto getTipoAbbonamentoById(Long id);
-    public List<TipoAbbonamentoDto> getTipiAbbonamento();
+    public TipoAbbonamentoResponse getTipoAbbonamentoById(Long id);
+    public List<TipoAbbonamentoResponse> getTipiAbbonamento();
 
 }

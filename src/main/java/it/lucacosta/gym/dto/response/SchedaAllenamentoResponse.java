@@ -1,18 +1,21 @@
-package it.lucacosta.gym.dto;
+package it.lucacosta.gym.dto.response;
 
 import java.sql.Date;
 import java.util.List;
 
+import it.lucacosta.gym.dto.AllenatoreDto;
+import it.lucacosta.gym.dto.EsercizioDto;
+import it.lucacosta.gym.dto.UtenteDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SchedaAllenamentoDto {
+public class SchedaAllenamentoResponse {
 
-    private Long id;
     private String nome;
     private UtenteDto utente;
     private AllenatoreDto allenatore;

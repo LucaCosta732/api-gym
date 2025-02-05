@@ -15,7 +15,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.lucacosta.gym.dto.TipoAbbonamentoDto; // Assumendo che TipoAbbonamentoDto esista
+import it.lucacosta.gym.dto.request.TipoAbbonamentoRequest;
+import it.lucacosta.gym.dto.response.TipoAbbonamentoResponse;
 
 @Tag(name = "TipoAbbonamento", description = "API per gestire i tipi di abbonamento")
 public interface TipoAbbonamentoController {
@@ -26,7 +27,7 @@ public interface TipoAbbonamentoController {
                         @ApiResponse(responseCode = "404", description = "Tipo di abbonamento non trovato")
         })
         @GetMapping("/{id}")
-        public ResponseEntity<TipoAbbonamentoDto> getTipoAbbonamentoById(
+        public ResponseEntity<TipoAbbonamentoResponse> getTipoAbbonamentoById(
 
                         @Parameter(description = "ID del tipo di abbonamento da recuperare", required = true) @PathVariable(value = "id") Long id);
 
@@ -38,7 +39,7 @@ public interface TipoAbbonamentoController {
                         @ApiResponse(responseCode = "200", description = "Lista dei tipi di abbonamento restituita con successo")
         })
         @GetMapping("/")
-        public ResponseEntity<List<TipoAbbonamentoDto>> getTipiAbbonamento();
+        public ResponseEntity<List<TipoAbbonamentoResponse>> getTipiAbbonamento();
         
         
         
@@ -49,7 +50,7 @@ public interface TipoAbbonamentoController {
                         @ApiResponse(responseCode = "400", description = "Richiesta non valida")
         })
         @PostMapping("/add")
-        public ResponseEntity<TipoAbbonamentoDto> addTipoAbbonamento(@RequestBody TipoAbbonamentoDto tipoAbbonamento);
+        public ResponseEntity<TipoAbbonamentoResponse> addTipoAbbonamento(@RequestBody TipoAbbonamentoRequest tipoAbbonamento);
 
         
         
@@ -62,9 +63,9 @@ public interface TipoAbbonamentoController {
                         @ApiResponse(responseCode = "404", description = "Tipo di abbonamento non trovato"),
                         @ApiResponse(responseCode = "400", description = "Richiesta non valida")
         })
-        @PutMapping("/update")
-        public ResponseEntity<TipoAbbonamentoDto> updateTipoAbbonamento(
-                        @RequestBody TipoAbbonamentoDto tipoAbbonamento);
+        @PutMapping("/update/{id}")
+        public ResponseEntity<TipoAbbonamentoResponse> updateTipoAbbonamento(
+                        @RequestBody TipoAbbonamentoRequest tipoAbbonamento, @PathVariable Long id);
 
         
         

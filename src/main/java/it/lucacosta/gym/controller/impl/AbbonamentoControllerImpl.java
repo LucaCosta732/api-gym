@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.lucacosta.gym.controller.AbbonamentoController;
-import it.lucacosta.gym.dto.AbbonamentoDto;
+import it.lucacosta.gym.dto.request.AbbonamentoRequest;
+import it.lucacosta.gym.dto.response.AbbonamentoResponse;
 import it.lucacosta.gym.service.AbbonamentoService;
 import lombok.RequiredArgsConstructor;
 
@@ -16,27 +17,29 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/abbonamento")
 @RequiredArgsConstructor
 public class AbbonamentoControllerImpl implements AbbonamentoController {
-        
+
     private final AbbonamentoService abbonamentoService;
 
     @Override
-    public ResponseEntity<AbbonamentoDto> getAbbonamentoById(Long id) {
-        return new ResponseEntity<AbbonamentoDto>(abbonamentoService.getAbbonamentoById(id), HttpStatus.OK);
+    public ResponseEntity<AbbonamentoResponse> getAbbonamentoById(Long id) {
+        return new ResponseEntity<AbbonamentoResponse>(abbonamentoService.getAbbonamentoById(id), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<AbbonamentoDto> addAbbonamento(AbbonamentoDto abbonamento) {
-        return new ResponseEntity<AbbonamentoDto>(abbonamentoService.addAbbonamento(abbonamento), HttpStatus.CREATED);
+    public ResponseEntity<List<AbbonamentoResponse>> getAbbonamenti(Long userId) {
+        return new ResponseEntity<List<AbbonamentoResponse>>(abbonamentoService.getAbbonamenti(userId), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<AbbonamentoDto> updateAbbonamento(AbbonamentoDto abbonamento) {
-        return new ResponseEntity<AbbonamentoDto>(abbonamentoService.updateAbbonamento(abbonamento), HttpStatus.OK);
+    public ResponseEntity<AbbonamentoResponse> addAbbonamento(Long idTipo, Long idUtente) {
+        return new ResponseEntity<AbbonamentoResponse>(abbonamentoService.addAbbonamento(idTipo, idUtente),
+                HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Boolean> deleteAbbonamento(Long id) {
-        return new ResponseEntity<Boolean>(abbonamentoService.deleteAbbonamento(id), HttpStatus.OK);
+    public ResponseEntity<AbbonamentoResponse> updateAbbonamento(Long id, AbbonamentoRequest abbonamento) {
+        return new ResponseEntity<AbbonamentoResponse>(abbonamentoService.updateAbbonamento(id, abbonamento),
+                HttpStatus.OK);
     }
 
     @Override
@@ -45,20 +48,19 @@ public class AbbonamentoControllerImpl implements AbbonamentoController {
     }
 
     @Override
-    public ResponseEntity<List<AbbonamentoDto>> getAbbonamenti(Long userId) {
-        return new ResponseEntity<List<AbbonamentoDto>>(abbonamentoService.getAbbonamenti(userId), HttpStatus.OK);
+    public ResponseEntity<Boolean> deleteAbbonamento(Long id) {
+        return new ResponseEntity<Boolean>(abbonamentoService.deleteAbbonamento(id), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<List<AbbonamentoDto>> controlloAbbonamentiScaduti() {
-        return new ResponseEntity<List<AbbonamentoDto>>(abbonamentoService.controlloAbbonamentiScaduti(), HttpStatus.OK);
+    public ResponseEntity<List<AbbonamentoResponse>> controlloAbbonamentiScaduti() {
+        return new ResponseEntity<List<AbbonamentoResponse>>(abbonamentoService.controlloAbbonamentiScaduti(),
+                HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<AbbonamentoDto> updateAbbonamento(Long id, Long idTipoAbbonamento) {
-        return new ResponseEntity<AbbonamentoDto>(abbonamentoService.updateAbbonamento(id, idTipoAbbonamento), HttpStatus.OK);
+    public ResponseEntity<AbbonamentoResponse> updateAbbonamento(Long id, Long idTipoAbbonamento) {
+        return new ResponseEntity<AbbonamentoResponse>(
+                abbonamentoService.updateAbbonamento(id, idTipoAbbonamento), HttpStatus.OK);
     }
-
-
-
 }

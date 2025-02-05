@@ -18,6 +18,7 @@ import it.lucacosta.gym.repository.AbbonamentoRepository;
 import it.lucacosta.gym.repository.TipoAbbonamentoRepository;
 import it.lucacosta.gym.repository.UtenteRepository;
 import it.lucacosta.gym.service.AbbonamentoService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,23 +32,29 @@ public class AbbonamentoServiceImpl implements AbbonamentoService {
     private final TipoAbbonamentoRepository tipoAbbonamentoRepository;
     private final AbbonamentoMapper abbonamentoMapper;
 
+
+    @Transactional
     @Override
-    public AbbonamentoDto addAbbonamento(AbbonamentoDto abbonamento) {
+    public AbbonamentoDto addAbbonamento(Long idTipoAbbonamento, Long idUtente) {
         log.info("[START] - [AbbonamentoServiceImpl] - addAbbonamento");
 
-        Abbonamento a = abbonamentoMapper.toModel(abbonamento);
-        a.setId(null);
+        Abbonamento a = new Abbonamento();
 
-        Utente utente = utenteRepository.findById(abbonamento.getUtente().getId())
+        Utente utente = utenteRepository.findById(idUtente)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utente non trovato"));
 
-        TipoAbbonamento tipoAbbonamento = tipoAbbonamentoRepository.findById(abbonamento.getTipo().getId())
+        TipoAbbonamento tipoAbbonamento = tipoAbbonamentoRepository.findById(idTipoAbbonamento)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TipoAbbonamento non trovato"));
+
+        if (abbonamentoRepository.existsByUtente(utente)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Utente già abbonato");
+        }
 
         a.setUtente(utente);
         a.setTipo(tipoAbbonamento);
         a.setDataInizio(Date.valueOf(LocalDate.now()));
         a.setDataFine(calcolaDataInizioFine(tipoAbbonamento.getNome()));
+        a.setStato(true);
 
         abbonamentoRepository.save(a);
 
@@ -168,24 +175,24 @@ public class AbbonamentoServiceImpl implements AbbonamentoService {
 
         List<Abbonamento> list = abbonamentoRepository.findAll();
 
-        for(Abbonamento a : list){
+        for (Abbonamento a : list) {
             a.setStato(controlloValidita(a.getId()));
         }
 
         List<Abbonamento> listAggiornata = list.stream().filter(a -> a.getStato() == false).toList();
-        
+
         return abbonamentoMapper.toDto(listAggiornata);
     }
 
     @Override
     public AbbonamentoDto updateAbbonamento(Long id, Long idTipoAbbonamento) {
-        log.info("[START] updateAbbonamento"); 
+        log.info("[START] updateAbbonamento");
 
-        if(!abbonamentoRepository.existsById(id)){
+        if (!abbonamentoRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Abbonamento non trovato");
         }
 
-        if(!tipoAbbonamentoRepository.existsById(idTipoAbbonamento)){
+        if (!tipoAbbonamentoRepository.existsById(idTipoAbbonamento)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipo Abbonamento non trovato");
         }
 

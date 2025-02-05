@@ -16,7 +16,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.lucacosta.gym.dto.UtenteDto; // Assumendo che UtenteDto esista
+import it.lucacosta.gym.dto.request.UtenteRequest;
+import it.lucacosta.gym.dto.response.UtenteResponse;
 
 @Tag(name = "Utente", description = "API per gestire gli utenti (es. clienti della palestra)")
 public interface UtenteController {
@@ -27,7 +28,7 @@ public interface UtenteController {
             @ApiResponse(responseCode = "404", description = "Utente non trovato")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UtenteDto> getUtenteById(
+    public ResponseEntity<UtenteResponse> getUtenteById(
             @Parameter(description = "ID dell'utente da recuperare", required = true) @PathVariable(value = "id") Long id);
 
     @Operation(summary = "Ottieni tutti gli utenti o filtra per nome", description = "Restituisce una lista di tutti gli utenti. Opzionalmente, puoi filtrare gli utenti per nome.")
@@ -35,7 +36,7 @@ public interface UtenteController {
             @ApiResponse(responseCode = "200", description = "Lista degli utenti restituita con successo")
     })
     @GetMapping("/")
-    public ResponseEntity<List<UtenteDto>> getUtenti(
+    public ResponseEntity<List<UtenteResponse>> getUtenti(
             @Parameter(description = "Nome dell'utente per filtrare (opzionale)") @RequestParam(value = "name", required = false) String name);
 
     @Operation(summary = "Aggiungi nuovi utenti", description = "Crea e aggiunge nuovi utenti al sistema.")
@@ -43,8 +44,18 @@ public interface UtenteController {
             @ApiResponse(responseCode = "201", description = "Utente creato con successo"),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
+    @PostMapping("/addAll")
+    public ResponseEntity<List<UtenteResponse>> addUtenti(@RequestBody List<UtenteRequest> utente);
+
+
+
+    @Operation(summary = "Aggiungi nuovo utente", description = "Crea e aggiunge un nuovo utente al sistema.")  
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Utente creato con successo"),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida")
+    })
     @PostMapping("/add")
-    public ResponseEntity<List<UtenteDto>> addUtenti(@RequestBody List<UtenteDto> utente);
+    public ResponseEntity<UtenteResponse> addUtente(@RequestBody UtenteRequest utente);  
 
     @Operation(summary = "Aggiorna un utente esistente", description = "Aggiorna i dettagli di un utente esistente.")
     @ApiResponses(value = {
@@ -52,8 +63,8 @@ public interface UtenteController {
             @ApiResponse(responseCode = "404", description = "Utente non trovato"),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
-    @PutMapping("/update")
-    public ResponseEntity<UtenteDto> updateUtente(@RequestBody UtenteDto utente);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<UtenteResponse> updateUtente(@RequestBody UtenteRequest utente, @PathVariable Long id);
 
     @Operation(summary = "Elimina un utente", description = "Elimina un utente dal sistema tramite il suo ID.")
     @ApiResponses(value = {

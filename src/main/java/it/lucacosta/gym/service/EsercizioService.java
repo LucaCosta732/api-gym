@@ -3,19 +3,20 @@ package it.lucacosta.gym.service;
 
 import java.util.List;
 
-import it.lucacosta.gym.dto.EsercizioDto;
+import it.lucacosta.gym.dto.request.EsercizioRequest;
+import it.lucacosta.gym.dto.response.EsercizioResponse;
 
 public interface EsercizioService {
     
-    public EsercizioDto getEsercizioById(Long id);
+    public EsercizioResponse getEsercizioById(Long id);
     
-    public List<EsercizioDto> getEsercizi();
+    public List<EsercizioResponse> getEsercizi();
     
-    public EsercizioDto addEsercizio(EsercizioDto esercizioDto);
+    public EsercizioResponse addEsercizio(EsercizioRequest esercizioDto);
     
-    public List<EsercizioDto> addEsercizi(List<EsercizioDto> eserciziDto);
+    public List<EsercizioResponse> addEsercizi(List<EsercizioRequest> eserciziDto);
     
-    public EsercizioDto updateEsercizio(EsercizioDto esercizioDto);
+    public EsercizioResponse updateEsercizio(Long id, EsercizioRequest esercizioDto);
     
     public Boolean deleteEsercizio(Long id);
 }

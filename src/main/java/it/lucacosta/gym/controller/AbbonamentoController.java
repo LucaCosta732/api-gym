@@ -13,91 +13,90 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.lucacosta.gym.dto.AbbonamentoDto;
+import it.lucacosta.gym.dto.request.AbbonamentoRequest;
+import it.lucacosta.gym.dto.response.AbbonamentoResponse;
 
 @Tag(name = "Abbonamento", description = "API per gestire gli abbonamenti degli utenti")
 public interface AbbonamentoController {
 
     @Operation(summary = "Ottieni un abbonamento per ID", description = "Restituisce i dettagli di un abbonamento specifico tramite il suo ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Abbonamento trovato"),
+            @ApiResponse(responseCode = "200", description = "Abbonamento trovato", content = @Content(schema = @Schema(implementation = AbbonamentoResponse.class))),
             @ApiResponse(responseCode = "404", description = "Abbonamento non trovato")
     })
     @GetMapping("/{id}")
-    ResponseEntity<AbbonamentoDto> getAbbonamentoById(
+    public ResponseEntity<AbbonamentoResponse> getAbbonamentoById(
             @Parameter(description = "ID dell'abbonamento da recuperare", required = true) @PathVariable(value = "id") Long id);
 
     @Operation(summary = "Ottieni tutti gli abbonamenti o filtra per utente", description = "Restituisce una lista di tutti gli abbonamenti. Opzionalmente, puoi filtrare gli abbonamenti per ID utente.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista degli abbonamenti restituita con successo")
+            @ApiResponse(responseCode = "200", description = "Lista degli abbonamenti restituita con successo", content = @Content(schema = @Schema(implementation = AbbonamentoResponse.class)))
     })
     @GetMapping("/")
-    ResponseEntity<List<AbbonamentoDto>> getAbbonamenti(
+    public ResponseEntity<List<AbbonamentoResponse>> getAbbonamenti(
             @Parameter(description = "ID dell'utente per filtrare gli abbonamenti (opzionale)") @RequestParam(value = "userId", required = false) Long userId);
 
     @Operation(summary = "Aggiungi un nuovo abbonamento", description = "Crea e aggiunge un nuovo abbonamento al sistema.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Abbonamento creato con successo"),
+            @ApiResponse(responseCode = "201", description = "Abbonamento creato con successo", content = @Content(schema = @Schema(implementation = AbbonamentoResponse.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
     @PostMapping("/add")
-    ResponseEntity<AbbonamentoDto> addAbbonamento(@RequestBody AbbonamentoDto abbonamento);
+    public ResponseEntity<AbbonamentoResponse> addAbbonamento(
+            @Parameter(description = "ID del tipo di abbonamento", required = true) @RequestParam Long idTipo,
+            @Parameter(description = "ID dell'utente associato all'abbonamento", required = true) @RequestParam Long idUtente);
 
     @Operation(summary = "Aggiorna un abbonamento esistente", description = "Aggiorna i dettagli di un abbonamento esistente.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Abbonamento aggiornato con successo"),
+            @ApiResponse(responseCode = "200", description = "Abbonamento aggiornato con successo", content = @Content(schema = @Schema(implementation = AbbonamentoResponse.class))),
             @ApiResponse(responseCode = "404", description = "Abbonamento non trovato"),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
-    @PutMapping("/update")
-    ResponseEntity<AbbonamentoDto> updateAbbonamento(@RequestBody AbbonamentoDto abbonamento);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<AbbonamentoResponse> updateAbbonamento(
+            @Parameter(description = "ID dell'abbonamento da aggiornare", required = true) @PathVariable Long id,
+            @Parameter(description = "Dettagli aggiornati dell'abbonamento", required = true) @RequestBody AbbonamentoRequest abbonamento);
 
     @Operation(summary = "Controlla validità abbonamento", description = "Verifica se un abbonamento è valido (attivo) in base alla data corrente.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Validità dell'abbonamento verificata con successo"),
-            @ApiResponse(responseCode = "400", description = "Richiesta non valida")
+            @ApiResponse(responseCode = "200", description = "Validità dell'abbonamento verificata con successo")
     })
     @GetMapping("/controlloValidita/{id}")
-    ResponseEntity<Boolean> controlloValiditaAbbonamento(
+    public ResponseEntity<Boolean> controlloValiditaAbbonamento(
             @Parameter(description = "ID dell'abbonamento da controllare", required = true) @PathVariable Long id);
 
     @Operation(summary = "Elimina un abbonamento", description = "Elimina un abbonamento dal sistema tramite il suo ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Abbonamento eliminato con successo"),
+            @ApiResponse(responseCode = "204", description = "Abbonamento eliminato con successo"),
             @ApiResponse(responseCode = "404", description = "Abbonamento non trovato")
     })
     @DeleteMapping("/delete/{id}")
-    ResponseEntity<Boolean> deleteAbbonamento(@PathVariable Long id);
+    public ResponseEntity<Boolean> deleteAbbonamento(@PathVariable Long id);
 
 
     @Operation(summary = "Controlla abbonamenti scaduti", description = "Verifica gli abbonamenti che sono scaduti e restituisce una lista di questi.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista degli abbonamenti scaduti trovati con successo"),
+            @ApiResponse(responseCode = "200", description = "Lista degli abbonamenti scaduti trovati con successo", content = @Content(schema = @Schema(implementation = AbbonamentoResponse.class))),
             @ApiResponse(responseCode = "404", description = "Nessun abbonamento scaduto trovato")
     })
     @GetMapping("/controlloAbbonamentiScaduti")
-    ResponseEntity<List<AbbonamentoDto>> controlloAbbonamentiScaduti();
+    public ResponseEntity<List<AbbonamentoResponse>> controlloAbbonamentiScaduti();
 
 
     @Operation(summary = "Aggiorna un abbonamento con parametri di query", description = "Aggiorna i dettagli di un abbonamento esistente utilizzando ID utente, ID tipo abbonamento e altri parametri di query.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Abbonamento aggiornato con successo"),
+            @ApiResponse(responseCode = "200", description = "Abbonamento aggiornato con successo", content = @Content(schema = @Schema(implementation = AbbonamentoResponse.class))),
             @ApiResponse(responseCode = "404", description = "Abbonamento non trovato"),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
-    @PutMapping("/updateWithParams")
-    ResponseEntity<AbbonamentoDto> updateAbbonamento(
-        @Parameter(description = "ID dell'abbonamento da aggiornare", required = true) @RequestParam Long id,
-        @Parameter(description = "ID tipo abbonamento") @RequestParam(value = "idTipoAbbonamento", required = true) Long idTipoAbbonamento
+    @PutMapping("/updateWithParams/{id}")
+    public ResponseEntity<AbbonamentoResponse> updateAbbonamento(
+        @Parameter(description = "ID dell'abbonamento da aggiornare", required = true) @PathVariable Long id,
+        @Parameter(description = "ID tipo abbonamento", required = true) @RequestParam(value = "idTipoAbbonamento", required = true) Long idTipoAbbonamento
     );
-
-
-
-
-    
-
-
 }

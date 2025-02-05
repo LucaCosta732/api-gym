@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.lucacosta.gym.controller.TipoAbbonamentoController;
-import it.lucacosta.gym.dto.TipoAbbonamentoDto;
+import it.lucacosta.gym.dto.request.TipoAbbonamentoRequest;
+import it.lucacosta.gym.dto.response.TipoAbbonamentoResponse;
 import it.lucacosta.gym.service.TipoAbbonamentoService;
 import lombok.RequiredArgsConstructor;
 
@@ -20,25 +21,27 @@ public class TipoAbbonamentoControllerImpl implements TipoAbbonamentoController 
     private final TipoAbbonamentoService tipoAbbonamentoService;
 
     @Override
-    public ResponseEntity<TipoAbbonamentoDto> getTipoAbbonamentoById(Long id) {
-        return new ResponseEntity<TipoAbbonamentoDto>(tipoAbbonamentoService.getTipoAbbonamentoById(id), HttpStatus.OK);
+    public ResponseEntity<TipoAbbonamentoResponse> getTipoAbbonamentoById(Long id) {
+        return new ResponseEntity<TipoAbbonamentoResponse>(tipoAbbonamentoService.getTipoAbbonamentoById(id), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<List<TipoAbbonamentoDto>> getTipiAbbonamento() {
-        return new ResponseEntity<List<TipoAbbonamentoDto>>(tipoAbbonamentoService.getTipiAbbonamento(), HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<TipoAbbonamentoDto> addTipoAbbonamento(TipoAbbonamentoDto tipoAbbonamento) {
-        return new ResponseEntity<TipoAbbonamentoDto>(tipoAbbonamentoService.addTipoAbbonamento(tipoAbbonamento),
-                HttpStatus.CREATED);
-    }
-
-    @Override
-    public ResponseEntity<TipoAbbonamentoDto> updateTipoAbbonamento(TipoAbbonamentoDto tipoAbbonamento) {
-        return new ResponseEntity<TipoAbbonamentoDto>(tipoAbbonamentoService.updateTipoAbbonamento(tipoAbbonamento),
+    public ResponseEntity<List<TipoAbbonamentoResponse>> getTipiAbbonamento() {
+        return new ResponseEntity<List<TipoAbbonamentoResponse>>(tipoAbbonamentoService.getTipiAbbonamento(),
                 HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<TipoAbbonamentoResponse> addTipoAbbonamento(TipoAbbonamentoRequest tipoAbbonamento) {
+        return new ResponseEntity<TipoAbbonamentoResponse>(tipoAbbonamentoService.addTipoAbbonamento(tipoAbbonamento),
+                HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<TipoAbbonamentoResponse> updateTipoAbbonamento(TipoAbbonamentoRequest tipoAbbonamento,
+            Long id) {
+        return new ResponseEntity<TipoAbbonamentoResponse>(
+                tipoAbbonamentoService.updateTipoAbbonamento(tipoAbbonamento, id), HttpStatus.OK);
     }
 
     @Override
