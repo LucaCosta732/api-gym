@@ -108,10 +108,10 @@ public class EsercizioServiceImpl implements EsercizioService {
     }
 
     private Esercizio findActiveEsercizioById(Long id) {
-        log.debug("Finding active Esercizio by ID: {}", id);
+        log.debug("Trova Esercizio con ID: {}", id); 
         Optional<Esercizio> esercizioOptional = esercizioRepository.findByIdAndEliminatoFalse(id);
         return esercizioOptional.orElseThrow(() -> {
-            log.warn("Esercizio not found or not active for ID: {}", id);
+            log.warn("Esercizio non trovato o non attivo per ID: {}", id);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "Esercizio con id " + id + " non trovato o non attivo.");
         });
     }

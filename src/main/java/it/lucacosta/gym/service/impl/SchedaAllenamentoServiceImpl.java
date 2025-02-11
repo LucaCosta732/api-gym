@@ -82,35 +82,50 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
     @Override
     public SchedaAllenamentoResponse updateRimuoviEsercizi(Long id, List<Long> eserciziDaRimuovere) {
         log.info("[START] updateRimuoviEsercizi");
+       
         SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
+       
         List<Esercizio> eserciziDaAggiungereList = esercizioRepository.findAllById(eserciziDaRimuovere);
+       
         s.getEsercizio().removeAll(eserciziDaAggiungereList);
         schedaAllenamentoRepository.save(s);
+       
         log.info("[END] updateRimuoviEsercizi");
+      
         return dtoMapper.toResponse(s);
     }
 
     @Override
     public SchedaAllenamentoResponse updateAllenatore(Long id, Long nuovoAllenatoreId) {
         log.info("[START] updateAllenatore");
+        
         Allenatore a = findActiveAllenatoreById(nuovoAllenatoreId);
+       
         SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
         s.setAllenatore(a);
+       
         schedaAllenamentoRepository.save(s);
+       
         log.info("[END] updateAllenatore");
+       
         return dtoMapper.toResponse(s);
     }
 
     @Override
     public SchedaAllenamentoResponse updateSchedaAllenamento(SchedaAllenamentoRequest schedaAllenamento, Long id) {
         log.info("[START] - updateSchedaAllenamento");
+
         SchedaAllenamento s = findActiveSchedaAllenamentoById(id);
         s.setNome(schedaAllenamento.getNome());
         s.setDataFine(schedaAllenamento.getDataFine());
+        
         List<Esercizio> list = findEserciziById(schedaAllenamento.getEsercizioID());
         s.setEsercizio(list);
+       
         schedaAllenamentoRepository.save(s);
+        
         log.info("[END] - updateSchedaAllenamento");
+       
         return dtoMapper.toResponse(s);
 
     }
@@ -126,7 +141,7 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
     }
 
     public SchedaAllenamento findActiveSchedaAllenamentoById(Long id) {
-        log.debug("Trovo Scheda Esercizio by ID: {}", id);
+        log.debug("Trova Scheda Esercizio by ID: {}", id);
         Optional<SchedaAllenamento> sOptional = schedaAllenamentoRepository.findByIdAndEliminatoFalse(id);
         return sOptional.orElseThrow(() -> {
             return new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -135,7 +150,7 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
     }
 
     private Esercizio findActiveEsercizioById(Long id) {
-        log.debug("Finding active Esercizio by ID: {}", id);
+        log.debug("Trova Esercizio con ID: {}", id); 
         Optional<Esercizio> esercizioOptional = esercizioRepository.findByIdAndEliminatoFalse(id);
         return esercizioOptional.orElseThrow(() -> {
             return new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -144,7 +159,7 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
     }
 
     private Allenatore findActiveAllenatoreById(Long id) {
-        log.debug("Finding active Allenatore by ID: {}", id);
+        log.debug("Trova l'Allenatore con ID: {}", id);
         Optional<Allenatore> allenatoreOptional = allenatoreRepository.findByIdAndEliminatoFalse(id);
         return allenatoreOptional.orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Allenatore con ID " + id + " non trovato"));

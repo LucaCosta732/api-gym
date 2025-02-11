@@ -30,11 +30,6 @@ public class AllenatoreServiceImpl implements AllenatoreService {
     public List<AllenatoreResponse> addAllenatori(List<AllenatoreRequest> allenatoreRequests) {
         log.info("[START] - [AllenatoreServiceImpl] - addAllenatori");
 
-        if (allenatoreRequests == null || allenatoreRequests.isEmpty()) {
-            log.warn("No Allenatori requests provided.");
-            return List.of();
-        }
-
         List<Allenatore> allenatoriToSave = modelMapper.toModel_A(allenatoreRequests);
         allenatoriToSave.forEach(allenatore -> {
             allenatore.setId(null);
@@ -43,7 +38,7 @@ public class AllenatoreServiceImpl implements AllenatoreService {
 
         List<Allenatore> savedAllenatori = allenatoreRepository.saveAll(allenatoriToSave);
 
-        log.info("[END] - [AllenatoreServiceImpl] - addAllenatori - Saved {} Allenatori", savedAllenatori.size());
+        log.info("[END] - [AllenatoreServiceImpl] - addAllenatori - Salvato {} Allenatori", savedAllenatori.size());
         return dtoMapper.toResponse_A(savedAllenatori);
     }
 
@@ -58,7 +53,7 @@ public class AllenatoreServiceImpl implements AllenatoreService {
 
         Allenatore updatedAllenatore = allenatoreRepository.save(existingAllenatore);
 
-        log.info("[END] - [AllenatoreServiceImpl] - updateAllenatore - ID: {} - Allenatore updated", id);
+        log.info("[END] - [AllenatoreServiceImpl] - updateAllenatore - ID: {} - Aggiornato", id);
         return dtoMapper.toResponse(updatedAllenatore);
     }
 
@@ -71,7 +66,7 @@ public class AllenatoreServiceImpl implements AllenatoreService {
         allenatoreToDelete.setEliminato(true);
         allenatoreRepository.save(allenatoreToDelete);
 
-        log.info("[END] - [AllenatoreServiceImpl] - deleteAllenatore - ID: {} - Allenatore soft deleted", id);
+        log.info("[END] - [AllenatoreServiceImpl] - deleteAllenatore - ID: {} - Allenatore eliminato", id);
         return true;
     }
 
@@ -81,20 +76,20 @@ public class AllenatoreServiceImpl implements AllenatoreService {
 
         Allenatore allenatore = findActiveAllenatoreById(id);
 
-        log.info("[END] - [AllenatoreServiceImpl] - getAllenatoreById - ID: {} - Allenatore found", id);
+        log.info("[END] - [AllenatoreServiceImpl] - getAllenatoreById - ID: {} - Allenatore trovato", id);
         return dtoMapper.toResponse(allenatore);
     }
 
     @Override
     public List<AllenatoreResponse> getAllenatori(String name) {
-        log.info("[START] - [AllenatoreServiceImpl] - getAllenatori - Name filter: {}", name);
+        log.info("[START] - [AllenatoreServiceImpl] - getAllenatori - Nome: {}", name);
 
         List<Allenatore> allenatori;
         if (name == null || name.trim().isEmpty()) {
-            log.debug("Fetching all active Allenatori.");
+            log.debug("Trova Allenatori.");
             allenatori = allenatoreRepository.findAllByEliminatoFalse();
         } else {
-            log.debug("Fetching active Allenatori filtered by name: {}", name);
+            log.debug("Trova allenatori attivi con nome: {}", name);
             allenatori = allenatoreRepository.findAllByNomeContainsIgnoreCaseAndEliminatoFalse(name);
         }
 
@@ -103,7 +98,7 @@ public class AllenatoreServiceImpl implements AllenatoreService {
     }
 
     private Allenatore findActiveAllenatoreById(Long id) {
-        log.debug("Finding active Allenatore by ID: {}", id);
+        log.debug("Trova Allenatore con ID: {}", id);
         Optional<Allenatore> allenatoreOptional = allenatoreRepository.findByIdAndEliminatoFalse(id);
         return allenatoreOptional.orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Allenatore con ID " + id + " non trovato"));

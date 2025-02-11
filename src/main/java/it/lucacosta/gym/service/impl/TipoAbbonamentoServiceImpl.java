@@ -89,10 +89,10 @@ public class TipoAbbonamentoServiceImpl implements TipoAbbonamentoService {
     }
 
     private TipoAbbonamento findActiveTipoAbbonamentoById(Long id) {
-        log.debug("Finding active TipoAbbonamento by ID: {}", id);
+        log.debug("Trova il TipoAbbonamento con ID: {}", id); 
         Optional<TipoAbbonamento> tipoAbbonamentoOptional = tipoAbbonamentoRepository.findByIdAndEliminatoFalse(id);
         return tipoAbbonamentoOptional.orElseThrow(() -> {
-            log.warn("TipoAbbonamento not found or not active for ID: {}", id);
+            log.warn("TipoAbbonamento non trovato o non attivo per ID: {}", id);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "TipoAbbonamento con id " + id + " non trovato o non attivo.");
         });
     }

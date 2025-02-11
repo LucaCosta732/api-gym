@@ -43,7 +43,7 @@ public class AbbonamentoServiceImpl implements AbbonamentoService {
         Abbonamento abbonamento = createNewAbbonamento(utente, tipoAbbonamento);
         Abbonamento savedAbbonamento = abbonamentoRepository.save(abbonamento);
 
-        log.info("[END] - [AbbonamentoServiceImpl] - addAbbonamento - Abbonamento ID: {} created",
+        log.info("[END] - [AbbonamentoServiceImpl] - addAbbonamento - Abbonamento ID: {} Creato",
                 savedAbbonamento.getId());
         return dtoMapper.toResponse(savedAbbonamento);
     }

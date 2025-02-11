@@ -104,10 +104,10 @@ public class UtenteServiceImpl implements UtenteService {
 
         List<Utente> utenti;
         if (name == null || name.trim().isEmpty()) {
-            log.debug("Fetching all active Utenti.");
+            log.debug("Trova tutti gli Utenti attivi.");
             utenti = utenteRepository.findAllByEliminatoFalse();
         } else {
-            log.debug("Fetching active Utenti filtered by name: {}", name);
+            log.debug("Trova tutti gli utenti attivi con il nome : {}", name);
             utenti = utenteRepository.findAllByNomeContainsIgnoreCaseAndEliminatoFalse(name);
         }
 
