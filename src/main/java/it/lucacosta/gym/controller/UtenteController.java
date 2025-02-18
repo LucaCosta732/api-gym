@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.lucacosta.gym.dto.request.UtenteRequest;
 import it.lucacosta.gym.dto.response.UtenteResponse;
+import jakarta.validation.Valid;
 
 @Tag(name = "Utente", description = "API per gestire gli utenti (es. clienti della palestra)")
 public interface UtenteController {
@@ -45,7 +46,7 @@ public interface UtenteController {
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
     @PostMapping("/addAll")
-    public ResponseEntity<List<UtenteResponse>> addUtenti(@RequestBody List<UtenteRequest> utente);
+    public ResponseEntity<List<UtenteResponse>> addUtenti(@RequestBody @Valid List<UtenteRequest> utente);
 
 
 
@@ -55,7 +56,7 @@ public interface UtenteController {
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
     @PostMapping("/add")
-    public ResponseEntity<UtenteResponse> addUtente(@RequestBody UtenteRequest utente);  
+    public ResponseEntity<UtenteResponse> addUtente(@RequestBody @Valid UtenteRequest utente);  
 
     @Operation(summary = "Aggiorna un utente esistente", description = "Aggiorna i dettagli di un utente esistente.")
     @ApiResponses(value = {
@@ -64,7 +65,7 @@ public interface UtenteController {
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
     @PutMapping("/update/{id}")
-    public ResponseEntity<UtenteResponse> updateUtente(@RequestBody UtenteRequest utente, @PathVariable Long id);
+    public ResponseEntity<UtenteResponse> updateUtente(@RequestBody @Valid UtenteRequest utente, @PathVariable Long id);
 
     @Operation(summary = "Elimina un utente", description = "Elimina un utente dal sistema tramite il suo ID.")
     @ApiResponses(value = {

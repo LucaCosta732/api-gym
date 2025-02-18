@@ -9,8 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import it.lucacosta.gym.dto.request.EsercizioRequest;
 import it.lucacosta.gym.dto.response.EsercizioResponse;
-import it.lucacosta.gym.mapper.DtoMapper;
-import it.lucacosta.gym.mapper.ModelMapper;
+import it.lucacosta.gym.mapper.EsercizioMapper;
 import it.lucacosta.gym.model.Esercizio;
 import it.lucacosta.gym.repository.EsercizioRepository;
 import it.lucacosta.gym.service.EsercizioService;
@@ -23,96 +22,54 @@ import lombok.extern.slf4j.Slf4j;
 public class EsercizioServiceImpl implements EsercizioService {
 
     private final EsercizioRepository esercizioRepository;
-    private final ModelMapper modelMapper;
-    private final DtoMapper dtoMapper;
+    private final EsercizioMapper esercizioMapper;
 
     @Override
     public EsercizioResponse getEsercizioById(Long id) {
-        log.info("[START] - [EsercizioServiceImpl] - getEsercizioById - ID: {}", id);
-
-        Esercizio esercizio = findActiveEsercizioById(id);
-
-        log.info("[END] - [EsercizioServiceImpl] - getEsercizioById - ID: {} - Esercizio found", id);
-        return dtoMapper.toResponse(esercizio);
+        Esercizio esercizio = trovaEsercizioAttivo(id);
+        return esercizioMapper.toDto(esercizio);
     }
 
     @Override
     public List<EsercizioResponse> getEsercizi() {
-        log.info("[START] - [EsercizioServiceImpl] - getEsercizi");
-
-        List<Esercizio> esercizi = esercizioRepository.findAllByEliminatoFalse();
-
-        log.info("[END] - [EsercizioServiceImpl] - getEsercizi - Found {} Esercizi", esercizi.size());
-        return dtoMapper.toResponse_E(esercizi);
+        List<Esercizio> list = esercizioRepository.findAllByEliminatoFalse();
+        return esercizioMapper.toDto(list);
     }
 
     @Override
     public EsercizioResponse addEsercizio(EsercizioRequest esercizioRequest) {
-        log.info("[START] - [EsercizioServiceImpl] - addEsercizio");
-        Esercizio esercizioToSave = modelMapper.toModel(esercizioRequest);
-        esercizioToSave.setId(null); 
-        esercizioToSave.setEliminato(false); 
-
-        Esercizio savedEsercizio = esercizioRepository.save(esercizioToSave);
-
-        log.info("[END] - [EsercizioServiceImpl] - addEsercizio - Esercizio ID: {} created", savedEsercizio.getId());
-        return dtoMapper.toResponse(savedEsercizio);
+        Esercizio esercizio = esercizioMapper.toModel(esercizioRequest);
+        esercizioRepository.save(esercizio);
+        return esercizioMapper.toDto(esercizio);
     }
 
     @Override
-    public List<EsercizioResponse> addEsercizi(List<EsercizioRequest> eserciziRequests) {
-        log.info("[START] - [EsercizioServiceImpl] - addEsercizi");
-
-        if (eserciziRequests == null || eserciziRequests.isEmpty()) {
-            log.warn("No Esercizi requests provided.");
-            return List.of(); 
-        }
-
-        List<Esercizio> eserciziToSave = modelMapper.toModel_E(eserciziRequests);
-        eserciziToSave.forEach(esercizio -> {
-            esercizio.setId(null); 
-            esercizio.setEliminato(false); 
-        });
-
-        List<Esercizio> savedEsercizi = esercizioRepository.saveAll(eserciziToSave);
-
-        log.info("[END] - [EsercizioServiceImpl] - addEsercizi - Saved {} Esercizi", savedEsercizi.size());
-        return dtoMapper.toResponse_E(savedEsercizi);
+    public List<EsercizioResponse> addEsercizi(List<EsercizioRequest> eserciziRequest) {
+        List<Esercizio> listaEsercizi = esercizioMapper.toModel(eserciziRequest);
+        esercizioRepository.saveAll(listaEsercizi);
+        return esercizioMapper.toDto(listaEsercizi);
     }
 
     @Override
     public EsercizioResponse updateEsercizio(Long id, EsercizioRequest esercizioRequest) {
-        log.info("[START] - [EsercizioServiceImpl] - updateEsercizio - ID: {}", id);
-
-        Esercizio existingEsercizio = findActiveEsercizioById(id);
-
-        modelMapper.updateModelFromDto(esercizioRequest, existingEsercizio); 
-        existingEsercizio.setEliminato(false); 
-
-        Esercizio updatedEsercizio = esercizioRepository.save(existingEsercizio);
-
-        log.info("[END] - [EsercizioServiceImpl] - updateEsercizio - ID: {} - Esercizio updated", id);
-        return dtoMapper.toResponse(updatedEsercizio);
+        Esercizio esercizio = trovaEsercizioAttivo(id);
+        esercizioMapper.updateModelFromDto(esercizioRequest, esercizio);
+        esercizioRepository.save(esercizio);
+        
+        return esercizioMapper.toDto(esercizio);
     }
 
     @Override
     public Boolean deleteEsercizio(Long id) {
-        log.info("[START] - [EsercizioServiceImpl] - deleteEsercizio - ID: {}", id);
-
-        Esercizio esercizioToDelete = findActiveEsercizioById(id);
-        esercizioToDelete.setEliminato(true); 
-        esercizioRepository.save(esercizioToDelete);
-
-        log.info("[END] - [EsercizioServiceImpl] - deleteEsercizio - ID: {} - Esercizio soft deleted", id);
+        Esercizio esercizio = trovaEsercizioAttivo(id);
+        esercizio.setEliminato(true);
+        esercizioRepository.save(esercizio);
         return true;
     }
 
-    private Esercizio findActiveEsercizioById(Long id) {
-        log.debug("Trova Esercizio con ID: {}", id); 
-        Optional<Esercizio> esercizioOptional = esercizioRepository.findByIdAndEliminatoFalse(id);
-        return esercizioOptional.orElseThrow(() -> {
-            log.warn("Esercizio non trovato o non attivo per ID: {}", id);
-            return new ResponseStatusException(HttpStatus.NOT_FOUND, "Esercizio con id " + id + " non trovato o non attivo.");
-        });
+    private Esercizio trovaEsercizioAttivo(Long id) {
+        Optional<Esercizio> esercizio = esercizioRepository.findByIdAndEliminatoFalse(id);
+        // Se non esiste restituisce eccezione
+        return esercizio.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Esercizio non trovato"));
     }
 }

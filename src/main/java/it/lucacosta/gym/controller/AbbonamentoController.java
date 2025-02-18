@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.lucacosta.gym.dto.response.AbbonamentoResponse;
-import it.lucacosta.gym.model.Abbonamento.Stato;
+import it.lucacosta.gym.model.Stato;
 
 @Tag(name = "Abbonamento", description = "API per gestire gli abbonamenti degli utenti")
 public interface AbbonamentoController {
@@ -83,8 +83,9 @@ public interface AbbonamentoController {
             @ApiResponse(responseCode = "400", description = "Richiesta non valida")
     })
     @PutMapping("/attivaAbbonamento/{id}")
-    public ResponseEntity<AbbonamentoResponse> updateAbbonamento(
+    public ResponseEntity<AbbonamentoResponse> attivaAbbonamento(
         @Parameter(description = "ID dell'abbonamento da aggiornare", required = true) @PathVariable Long id,
         @Parameter(description = "ID tipo abbonamento", required = true) @RequestParam(value = "idTipoAbbonamento", required = true) Long idTipoAbbonamento
     );
+
 }

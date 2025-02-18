@@ -4,7 +4,7 @@ import java.util.List;
 
 
 import it.lucacosta.gym.dto.response.AbbonamentoResponse;
-import it.lucacosta.gym.model.Abbonamento.Stato;
+import it.lucacosta.gym.model.Stato;
 
 public interface AbbonamentoService {
 
@@ -14,6 +14,6 @@ public interface AbbonamentoService {
     public List<AbbonamentoResponse> getAbbonamenti(Long userId);
     public Stato controlloValidita(Long id);
     public List<AbbonamentoResponse> controlloAbbonamentiScaduti();
-    public AbbonamentoResponse updateAbbonamento(Long id,  Long idTipoAbbonamento);
+    public AbbonamentoResponse attivaAbbonamento(Long id,  Long idTipoAbbonamento);
 
 }

@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SchedaAllenamentoResponse {
 
+    private Long id;
     private String nome;
     private UtenteResponse utente;
     private AllenatoreResponse allenatore;

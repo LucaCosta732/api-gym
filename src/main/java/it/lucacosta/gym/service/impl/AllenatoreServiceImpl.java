@@ -9,8 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import it.lucacosta.gym.dto.request.AllenatoreRequest;
 import it.lucacosta.gym.dto.response.AllenatoreResponse;
-import it.lucacosta.gym.mapper.DtoMapper;
-import it.lucacosta.gym.mapper.ModelMapper;
+import it.lucacosta.gym.mapper.AllenatoreMapper;
 import it.lucacosta.gym.model.Allenatore;
 import it.lucacosta.gym.repository.AllenatoreRepository;
 import it.lucacosta.gym.service.AllenatoreService;
@@ -23,84 +22,51 @@ import lombok.extern.slf4j.Slf4j;
 public class AllenatoreServiceImpl implements AllenatoreService {
 
     private final AllenatoreRepository allenatoreRepository;
-    private final ModelMapper modelMapper;
-    private final DtoMapper dtoMapper;
+    private final AllenatoreMapper allenatoreMapper;
 
     @Override
-    public List<AllenatoreResponse> addAllenatori(List<AllenatoreRequest> allenatoreRequests) {
-        log.info("[START] - [AllenatoreServiceImpl] - addAllenatori");
-
-        List<Allenatore> allenatoriToSave = modelMapper.toModel_A(allenatoreRequests);
-        allenatoriToSave.forEach(allenatore -> {
-            allenatore.setId(null);
-            allenatore.setEliminato(false);
-        });
-
-        List<Allenatore> savedAllenatori = allenatoreRepository.saveAll(allenatoriToSave);
-
-        log.info("[END] - [AllenatoreServiceImpl] - addAllenatori - Salvato {} Allenatori", savedAllenatori.size());
-        return dtoMapper.toResponse_A(savedAllenatori);
+    public List<AllenatoreResponse> addAllenatori(List<AllenatoreRequest> allenatoriRequest) {
+        List<Allenatore> allenatori = allenatoreMapper.toModel(allenatoriRequest);
+        allenatoreRepository.saveAll(allenatori);
+        return allenatoreMapper.toDto(allenatori);
     }
 
     @Override
     public AllenatoreResponse updateAllenatore(Long id, AllenatoreRequest allenatoreRequest) {
-        log.info("[START] - [AllenatoreServiceImpl] - updateAllenatore - ID: {}", id);
-
-        Allenatore existingAllenatore = findActiveAllenatoreById(id);
-
-        modelMapper.updateModelFromDto(allenatoreRequest, existingAllenatore);
-        existingAllenatore.setEliminato(false);
-
-        Allenatore updatedAllenatore = allenatoreRepository.save(existingAllenatore);
-
-        log.info("[END] - [AllenatoreServiceImpl] - updateAllenatore - ID: {} - Aggiornato", id);
-        return dtoMapper.toResponse(updatedAllenatore);
+        Allenatore allenatore = trovaAllenatoreAttivo(id);
+        allenatoreMapper.updateModelFromDto(allenatoreRequest, allenatore);
+        allenatoreRepository.save(allenatore);
+        return allenatoreMapper.toDto(allenatore);
     }
 
     @Override
     public Boolean deleteAllenatore(Long id) {
-        log.info("[START] - [AllenatoreServiceImpl] - deleteAllenatore - ID: {}", id);
-
-        Allenatore allenatoreToDelete = findActiveAllenatoreById(id);
-
-        allenatoreToDelete.setEliminato(true);
-        allenatoreRepository.save(allenatoreToDelete);
-
-        log.info("[END] - [AllenatoreServiceImpl] - deleteAllenatore - ID: {} - Allenatore eliminato", id);
+        Allenatore allenatore = trovaAllenatoreAttivo(id);
+        allenatore.setEliminato(true);
+        allenatoreRepository.save(allenatore);
         return true;
     }
 
     @Override
     public AllenatoreResponse getAllenatoreById(Long id) {
-        log.info("[START] - [AllenatoreServiceImpl] - getAllenatoreById - ID: {}", id);
-
-        Allenatore allenatore = findActiveAllenatoreById(id);
-
-        log.info("[END] - [AllenatoreServiceImpl] - getAllenatoreById - ID: {} - Allenatore trovato", id);
-        return dtoMapper.toResponse(allenatore);
+        Allenatore allenatore = trovaAllenatoreAttivo(id);
+        return allenatoreMapper.toDto(allenatore);
     }
 
     @Override
     public List<AllenatoreResponse> getAllenatori(String name) {
-        log.info("[START] - [AllenatoreServiceImpl] - getAllenatori - Nome: {}", name);
-
         List<Allenatore> allenatori;
-        if (name == null || name.trim().isEmpty()) {
-            log.debug("Trova Allenatori.");
+        if (name == null || name.isBlank()) {
             allenatori = allenatoreRepository.findAllByEliminatoFalse();
         } else {
-            log.debug("Trova allenatori attivi con nome: {}", name);
             allenatori = allenatoreRepository.findAllByNomeContainsIgnoreCaseAndEliminatoFalse(name);
         }
-
-        log.info("[END] - [AllenatoreServiceImpl] - getAllenatori - Found {} Allenatori", allenatori.size());
-        return dtoMapper.toResponse_A(allenatori);
+        return allenatoreMapper.toDto(allenatori);
     }
 
-    private Allenatore findActiveAllenatoreById(Long id) {
-        log.debug("Trova Allenatore con ID: {}", id);
-        Optional<Allenatore> allenatoreOptional = allenatoreRepository.findByIdAndEliminatoFalse(id);
-        return allenatoreOptional.orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Allenatore con ID " + id + " non trovato"));
+    private Allenatore trovaAllenatoreAttivo(Long id) {
+        Optional<Allenatore> allenatore = allenatoreRepository.findByIdAndEliminatoFalse(id);
+        // Se non esiste restituisce eccezione
+        return allenatore.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Allenatore non trovato"));
     }
 }

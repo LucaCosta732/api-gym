@@ -52,11 +52,4 @@ public class Abbonamento {
     @Column(name = "FLAG_ELIMINATO")
     private Boolean eliminato = false;
 
-
-    public enum Stato{
-        ATTIVO,
-        SCADUTO,
-        IN_ATTESA
-    }
-
 }

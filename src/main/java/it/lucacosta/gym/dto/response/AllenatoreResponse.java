@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AllenatoreResponse {
 
+    private Long id;
     private String nome;
     private String cognome;
     private String specializzazione;

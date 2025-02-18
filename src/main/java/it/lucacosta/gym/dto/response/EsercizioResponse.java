@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class EsercizioResponse {
 
+    private Long id;
     private String nome;
     private String descrizione;
     private String gruppoMuscolare;

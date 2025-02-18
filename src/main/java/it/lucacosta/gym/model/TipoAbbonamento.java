@@ -37,10 +37,4 @@ public class TipoAbbonamento {
     @Column(name = "FLAG_ELIMINATO")
     private Boolean eliminato = false;
 
-
-    public enum Tipo{
-        ANNUALE,
-        SEMESTRALE,
-        MENSILE
-    }
 }

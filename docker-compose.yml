@@ -27,5 +27,5 @@ services:
     ports:
       - 8080:8080
 
-volumes: # Definisci i volumi nominati qui
-  pgdata: # Definisce il volume nominato "pgdata"
+volumes: 
+  pgdata:

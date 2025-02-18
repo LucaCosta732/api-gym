@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import it.lucacosta.gym.controller.AbbonamentoController;
 import it.lucacosta.gym.dto.response.AbbonamentoResponse;
-import it.lucacosta.gym.model.Abbonamento.Stato;
+import it.lucacosta.gym.model.Stato;
 import it.lucacosta.gym.service.AbbonamentoService;
 import lombok.RequiredArgsConstructor;
 
@@ -54,8 +54,8 @@ public class AbbonamentoControllerImpl implements AbbonamentoController {
     }
 
     @Override
-    public ResponseEntity<AbbonamentoResponse> updateAbbonamento(Long id, Long idTipoAbbonamento) {
+    public ResponseEntity<AbbonamentoResponse> attivaAbbonamento(Long id, Long idTipoAbbonamento) {
         return new ResponseEntity<AbbonamentoResponse>(
-                abbonamentoService.updateAbbonamento(id, idTipoAbbonamento), HttpStatus.OK);
+                abbonamentoService.attivaAbbonamento(id, idTipoAbbonamento), HttpStatus.OK);
     }
 }

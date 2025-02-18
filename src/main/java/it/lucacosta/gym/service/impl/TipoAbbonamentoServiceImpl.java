@@ -9,8 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import it.lucacosta.gym.dto.request.TipoAbbonamentoRequest;
 import it.lucacosta.gym.dto.response.TipoAbbonamentoResponse;
-import it.lucacosta.gym.mapper.DtoMapper;
-import it.lucacosta.gym.mapper.ModelMapper;
+import it.lucacosta.gym.mapper.TipoAbbonamentoMapper;
 import it.lucacosta.gym.model.TipoAbbonamento;
 import it.lucacosta.gym.repository.TipoAbbonamentoRepository;
 import it.lucacosta.gym.service.TipoAbbonamentoService;
@@ -23,77 +22,52 @@ import lombok.extern.slf4j.Slf4j;
 public class TipoAbbonamentoServiceImpl implements TipoAbbonamentoService {
 
     private final TipoAbbonamentoRepository tipoAbbonamentoRepository;
-    private final ModelMapper modelMapper;
-    private final DtoMapper dtoMapper;
+    private final TipoAbbonamentoMapper tipoAbbonamentoMapper;
 
     @Override
     public TipoAbbonamentoResponse addTipoAbbonamento(TipoAbbonamentoRequest tipoAbbonamentoRequest) {
-        log.info("[START] - [TipoAbbonamentoServiceImpl] - addTipoAbbonamento");
+        TipoAbbonamento tipoAbbonamento = tipoAbbonamentoMapper.toModel(tipoAbbonamentoRequest);
+        tipoAbbonamentoRepository.save(tipoAbbonamento);
 
-        TipoAbbonamento tipoAbbonamentoToSave = modelMapper.toModel(tipoAbbonamentoRequest);
-        tipoAbbonamentoToSave.setId(null); 
-        tipoAbbonamentoToSave.setEliminato(false); 
-
-        TipoAbbonamento savedTipoAbbonamento = tipoAbbonamentoRepository.save(tipoAbbonamentoToSave);
-
-        log.info("[END] - [TipoAbbonamentoServiceImpl] - addTipoAbbonamento - TipoAbbonamento ID: {} created", savedTipoAbbonamento.getId());
-        return dtoMapper.toResponse(savedTipoAbbonamento);
+        return tipoAbbonamentoMapper.toDto(tipoAbbonamento);
     }
 
     @Override
     public TipoAbbonamentoResponse updateTipoAbbonamento(TipoAbbonamentoRequest tipoAbbonamentoRequest, Long id) {
-        log.info("[START] - [TipoAbbonamentoServiceImpl] - updateTipoAbbonamento - ID: {}", id);
+        TipoAbbonamento tipoAbbonamento = trovaTipoAbbonamentoAttivo(id);
+        tipoAbbonamentoMapper.updateTipoAbbonamento(tipoAbbonamentoRequest, tipoAbbonamento);
+        tipoAbbonamentoRepository.save(tipoAbbonamento);
 
-        TipoAbbonamento existingTipoAbbonamento = findActiveTipoAbbonamentoById(id);
-
-        modelMapper.updateModelFromDto(tipoAbbonamentoRequest, existingTipoAbbonamento); 
-        existingTipoAbbonamento.setEliminato(false); 
-
-        TipoAbbonamento updatedTipoAbbonamento = tipoAbbonamentoRepository.save(existingTipoAbbonamento);
-
-        log.info("[END] - [TipoAbbonamentoServiceImpl] - updateTipoAbbonamento - ID: {} - TipoAbbonamento updated", id);
-        return dtoMapper.toResponse(updatedTipoAbbonamento);
+        return tipoAbbonamentoMapper.toDto(tipoAbbonamento);
     }
 
     @Override
     public Boolean deleteTipoAbbonamento(Long id) {
-        log.info("[START] - [TipoAbbonamentoServiceImpl] - deleteTipoAbbonamento - ID: {}", id);
+        TipoAbbonamento tipoAbbonamento = trovaTipoAbbonamentoAttivo(id);
+        tipoAbbonamento.setEliminato(true);
+        tipoAbbonamentoRepository.save(tipoAbbonamento);
 
-        TipoAbbonamento tipoAbbonamentoToDelete = findActiveTipoAbbonamentoById(id);
-
-        tipoAbbonamentoToDelete.setEliminato(true);
-        tipoAbbonamentoRepository.save(tipoAbbonamentoToDelete);
-
-        log.info("[END] - [TipoAbbonamentoServiceImpl] - deleteTipoAbbonamento - ID: {} - TipoAbbonamento soft deleted", id);
         return true;
     }
 
     @Override
     public TipoAbbonamentoResponse getTipoAbbonamentoById(Long id) {
-        log.info("[START] - [TipoAbbonamentoServiceImpl] - getTipoAbbonamentoById - ID: {}", id);
+        TipoAbbonamento tipoAbbonamento = trovaTipoAbbonamentoAttivo(id);
 
-        TipoAbbonamento tipoAbbonamento = findActiveTipoAbbonamentoById(id);
-
-        log.info("[END] - [TipoAbbonamentoServiceImpl] - getTipoAbbonamentoById - ID: {} - TipoAbbonamento found", id);
-        return dtoMapper.toResponse(tipoAbbonamento);
+        return tipoAbbonamentoMapper.toDto(tipoAbbonamento);
     }
 
     @Override
     public List<TipoAbbonamentoResponse> getTipiAbbonamento() {
-        log.info("[START] - [TipoAbbonamentoServiceImpl] - getTipiAbbonamento");
+        List<TipoAbbonamento> tipoAbbonamentos = tipoAbbonamentoRepository.findAllByEliminatoFalse();
 
-        List<TipoAbbonamento> tipiAbbonamento = tipoAbbonamentoRepository.findAllByEliminatoFalse();
-
-        log.info("[END] - [TipoAbbonamentoServiceImpl] - getTipiAbbonamento - Found {} TipoAbbonamenti", tipiAbbonamento.size());
-        return dtoMapper.toResponse_TA(tipiAbbonamento);
+        return tipoAbbonamentoMapper.toDto(tipoAbbonamentos);
     }
 
-    private TipoAbbonamento findActiveTipoAbbonamentoById(Long id) {
-        log.debug("Trova il TipoAbbonamento con ID: {}", id); 
-        Optional<TipoAbbonamento> tipoAbbonamentoOptional = tipoAbbonamentoRepository.findByIdAndEliminatoFalse(id);
-        return tipoAbbonamentoOptional.orElseThrow(() -> {
-            log.warn("TipoAbbonamento non trovato o non attivo per ID: {}", id);
-            return new ResponseStatusException(HttpStatus.NOT_FOUND, "TipoAbbonamento con id " + id + " non trovato o non attivo.");
-        });
+    private TipoAbbonamento trovaTipoAbbonamentoAttivo(Long id) {
+        Optional<TipoAbbonamento> tipoAbbonamento = tipoAbbonamentoRepository.findByIdAndEliminatoFalse(id);
+        return tipoAbbonamento
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipo abbonamento non trovato"));
     }
+
 }
