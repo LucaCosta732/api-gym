@@ -43,7 +43,7 @@ class AbbonamentoControllerTest {
         abbonamentoTest.setTipo(new TipoAbbonamentoResponse(1L, Tipo.MENSILE, "Mensile", 128D));
         abbonamentoTest.setUtente(
                 new UtenteResponse(1L, "Mario", "Rossi",
-                        "test@test.com", "password", Date.valueOf(LocalDate.now()),
+                        "test@test.com", Date.valueOf(LocalDate.now()),
                         "393333333333"));
         abbonamentoTest.setDataInizio(Date.valueOf(LocalDate.of(2025, 2, 18))); // 18 Febbraio 2025
         abbonamentoTest.setDataFine(Date.valueOf(LocalDate.of(2026, 2, 18))); // 18 Febbraio 2026

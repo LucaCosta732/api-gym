@@ -16,7 +16,6 @@ public class UtenteResponse {
     private String nome;
     private String cognome;
     private String email;
-    private String password;
     private Date dataIscrizione;
     private String telefono;
 
