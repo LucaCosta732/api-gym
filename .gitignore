@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+".env"    # Lo aggiunge a .gitignore
+".env" 
