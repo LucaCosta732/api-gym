@@ -54,19 +54,9 @@ public interface SchedaAllenamentoController {
         @PutMapping("/{id}/eserciziDaAggiungere")
         public ResponseEntity<SchedaAllenamentoResponse> updateEserciziDaAggiungere(
                         @Parameter(description = "ID della scheda allenamento a cui aggiungere esercizi", required = true) @PathVariable Long id,
-                        @Parameter(description = "Lista degli ID degli esercizi da aggiungere", required = true) @RequestBody List<Long> eserciziDaAggiungere);
+                        @Parameter(description = "Lista degli ID degli esercizi da aggiungere", required = true) @RequestParam List<Long> eserciziDaAggiungere);
 
-        @Operation(summary = "Rimuovi esercizi da una scheda allenamento", description = "Rimuove una lista di esercizi da una scheda allenamento esistente.")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Scheda allenamento aggiornata con successo", content = @Content(schema = @Schema(implementation = SchedaAllenamentoResponse.class))),
-                        @ApiResponse(responseCode = "404", description = "Scheda allenamento non trovata"),
-                        @ApiResponse(responseCode = "400", description = "Richiesta non valida")
-        })
-        @PutMapping("/{id}/eserciziDaRimuovere")
-        public ResponseEntity<SchedaAllenamentoResponse> updateEserciziDaRimuovere(
-                        @Parameter(description = "ID della scheda allenamento da cui rimuovere esercizi", required = true) @PathVariable Long id,
-                        @Parameter(description = "Lista degli ID degli esercizi da rimuovere", required = true) @RequestBody List<Long> eserciziDaRimuovere);
-
+       
         @Operation(summary = "Aggiorna l'allenatore di una scheda allenamento", description = "Modifica l'allenatore assegnato ad una scheda allenamento esistente.")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Scheda allenamento aggiornata con successo", content = @Content(schema = @Schema(implementation = SchedaAllenamentoResponse.class))),

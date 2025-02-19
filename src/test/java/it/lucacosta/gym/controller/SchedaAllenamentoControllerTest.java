@@ -165,20 +165,6 @@ public class SchedaAllenamentoControllerTest {
         assertEquals(schedaAllenamentoTest.getEsercizio().size(), risultato.getBody().getEsercizio().size()); }
 
     @Test
-    void testUpdateEserciziDaRimuovere_inputValidi_ritornaOK() {
-        Long schedaId = 1L;
-        when(schedaAllenamentoService.updateRimuoviEsercizi(schedaId, eserciziIdsList))
-                .thenReturn(schedaAllenamentoTest);
-
-        ResponseEntity<SchedaAllenamentoResponse> risultato = schedaAllenamentoController
-                .updateEserciziDaRimuovere(schedaId, eserciziIdsList);
-
-        assertEquals(HttpStatus.OK, risultato.getStatusCode());
-        assertNotNull(risultato.getBody());
-        assertEquals(schedaAllenamentoTest.getId(), risultato.getBody().getId());
-    }
-
-    @Test
     void testUpdateAllenatore_inputValidi_ritornaOK() {
         Long schedaId = 1L;
         Long nuovoAllenatoreId = 2L; 

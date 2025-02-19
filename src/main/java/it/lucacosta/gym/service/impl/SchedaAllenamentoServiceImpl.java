@@ -53,7 +53,7 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
     @Override
     public SchedaAllenamentoResponse createSchedaAllenamento(Long utenteId, Long allenatoreId,
             SchedaAllenamentoRequest schedaAllenamentoRequest) {
-        Utente utente = trovaUtenteAttivo(allenatoreId);
+        Utente utente = trovaUtenteAttivo(utenteId);
         Allenatore allenatore = trovaAllenatore(allenatoreId);
 
         SchedaAllenamento schedaAllenamento = creaScheda(schedaAllenamentoRequest, utente, allenatore);
@@ -65,25 +65,7 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
     public SchedaAllenamentoResponse updateAggiungiEsercizi(Long idScheda, List<Long> eserciziDaAggiungere) {
         SchedaAllenamento schedaAllenamento = trovaSchedeAllenamento(idScheda);
         List<Esercizio> esercizi = new ArrayList<>(eserciziDaAggiungere.stream().map(this::trovaEsercizio).toList());
-        esercizi.addAll(schedaAllenamento.getEsercizio());
         schedaAllenamento.setEsercizio(esercizi);
-        schedaAllenamentoRepository.save(schedaAllenamento);
-
-        return schedaAllenamentoMapper.toDto(schedaAllenamento);
-    }
-
-    @Override
-    public SchedaAllenamentoResponse updateRimuoviEsercizi(Long idScheda, List<Long> eserciziDaRimuovere) {
-        SchedaAllenamento schedaAllenamento = trovaSchedeAllenamento(idScheda);
-
-        List<Esercizio> eserciziAttuali = schedaAllenamento.getEsercizio();
-
-        // Filtra gli esercizi con quelli attuali
-        List<Esercizio> eserciziAggiornati = new ArrayList<>(eserciziAttuali.stream()
-                .filter(esercizio -> !eserciziDaRimuovere.contains(esercizio.getId()))
-                .toList());
-
-        schedaAllenamento.setEsercizio(eserciziAggiornati);
         schedaAllenamentoRepository.save(schedaAllenamento);
 
         return schedaAllenamentoMapper.toDto(schedaAllenamento);
