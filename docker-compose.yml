@@ -12,8 +12,8 @@ services:
       - type: tmpfs
         target: /dev/shm
         tmpfs:
-          size: 134217728 # 128*2^20 bytes = 128Mb
-      - pgdata:/var/lib/postgresql/data # Volume nominato per i dati PostgreSQL!
+          size: 134217728 
+      - pgdata:/var/lib/postgresql/data 
     ports:
       - 5432:5432
     environment:

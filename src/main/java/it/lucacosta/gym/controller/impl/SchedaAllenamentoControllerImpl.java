@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/v1/schedaAllenamento")
 @RequiredArgsConstructor
+@Validated
 public class SchedaAllenamentoControllerImpl implements SchedaAllenamentoController {
 
     private final SchedaAllenamentoService schedaAllenamentoService;
