@@ -57,6 +57,7 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
         Allenatore allenatore = trovaAllenatore(allenatoreId);
 
         SchedaAllenamento schedaAllenamento = creaScheda(schedaAllenamentoRequest, utente, allenatore);
+        schedaAllenamentoRepository.save(schedaAllenamento);
 
         return schedaAllenamentoMapper.toDto(schedaAllenamento);
     }
@@ -136,11 +137,14 @@ public class SchedaAllenamentoServiceImpl implements SchedaAllenamentoService {
 
     private SchedaAllenamento creaScheda(SchedaAllenamentoRequest schedaAllenamentoRequest, Utente utente,
             Allenatore allenatore) {
+        List<Esercizio> list = schedaAllenamentoRequest.getEsercizioID().stream().map(this::trovaEsercizio).toList();
+
         SchedaAllenamento schedaAllenamento = schedaAllenamentoMapper.toModel(schedaAllenamentoRequest);
         schedaAllenamento.setAllenatore(allenatore);
         schedaAllenamento.setUtente(utente);
         schedaAllenamento.setDataCreazione(Date.valueOf(LocalDate.now()));
         schedaAllenamento.setStato(false);
+        schedaAllenamento.setEsercizio(list);
 
         return schedaAllenamento;
     }
