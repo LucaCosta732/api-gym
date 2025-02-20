@@ -2,7 +2,7 @@
 
 ## Ambienti
 
-* **Test:** Utilizza un database H2 in-memory.
+* **Test:** Database H2.
 * **Dev:** Utilizza un database PostgreSQL gestito con Docker Compose.
 
 ## Tecnologie
