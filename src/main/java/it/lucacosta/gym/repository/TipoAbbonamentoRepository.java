@@ -9,7 +9,6 @@ import it.lucacosta.gym.model.TipoAbbonamento;
 
 public interface TipoAbbonamentoRepository extends JpaRepository<TipoAbbonamento, Long> {
 
-    Optional<List<TipoAbbonamento>> findByPrezzoLessThan(Double prezzo);
     List<TipoAbbonamento> findAllByEliminatoFalse();
     Optional<TipoAbbonamento> findByIdAndEliminatoFalse(Long id);
     Boolean existsByIdAndEliminatoFalse(Long id);
