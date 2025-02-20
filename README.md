@@ -350,16 +350,12 @@ Questa sezione descrive l'approccio ai test utilizzato nel progetto, includendo 
 *   **JUnit:** Utilizzato per scrivere ed eseguire i test unitari e di integrazione.
 *   **Mockito:** Utilizzato per creare mock degli oggetti e semplificare i test unitari.
 *   **AssertJ:** Utilizzato per asserzioni più leggibili e potenti.
-*   **Testcontainers:** Utilizzato per avviare database PostgreSQL in Docker per test di integrazione realistici.  (Solo nel profilo `dev`)
-*   **H2 Database:** Utilizzato come database in-memory per i test nel profilo `test`.
-
+*   **Testcontainers:** Utilizzato per avviare database PostgreSQL in Docker per test di integrazione realistici. 
 ### Copertura del Codice
 
 *   **Jacoco:** Utilizzato per generare report di code coverage, indicando la percentuale di codice testato.
+![image](https://github.com/user-attachments/assets/2f76e9be-7b0b-4076-aa90-d5e4ae3a1ad0)
 
-### Struttura dei Test
-
-I test sono organizzati in modo da riflettere la struttura del codice, con test unitari per ogni componente (controller, service, repository) e test di integrazione per verificare l'interazione tra i componenti.
 
 ### Esecuzione dei Test
 
