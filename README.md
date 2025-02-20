@@ -20,8 +20,6 @@
 *   TipoAbbonamento
 *   SchedaAllenamento
 
-## API
-
 ## Utente
 - **GET /v1/utente/{id}**: Ottiene un utente per ID.
 - **GET /v1/utente/**: Ottiene tutti gli utenti.
