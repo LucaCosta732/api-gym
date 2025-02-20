@@ -70,14 +70,10 @@
 
           
 ## Test
-
-Questa sezione descrive l'approccio ai test utilizzato nel progetto, includendo le tecnologie e la copertura del codice.
-
 ### Framework di Test
 
 *   **JUnit:** Utilizzato per scrivere ed eseguire i test unitari e di integrazione.
 *   **Mockito:** Utilizzato per creare mock degli oggetti e semplificare i test unitari.
-*   **AssertJ:** Utilizzato per asserzioni più leggibili e potenti.
 *   **Testcontainers:** Utilizzato per avviare database PostgreSQL in Docker per test di integrazione realistici. 
 ### Copertura del Codice
 
